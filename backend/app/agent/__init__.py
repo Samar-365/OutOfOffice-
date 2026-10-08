@@ -5,7 +5,16 @@ from .schemas import (
     InvestigationOutput,
     PatchOutput,
     ReportOutput,
+    extract_json_block,
+    repair_json_string,
     parse_and_validate_json,
+)
+from .prompts import (
+    SYSTEM_PROMPT_AGENT_CORE,
+    build_planner_prompt,
+    build_investigation_prompt,
+    build_fixer_prompt,
+    build_reporter_prompt,
 )
 
 __all__ = [
@@ -14,5 +23,12 @@ __all__ = [
     "InvestigationOutput",
     "PatchOutput",
     "ReportOutput",
+    "extract_json_block",
+    "repair_json_string",
     "parse_and_validate_json",
+    "SYSTEM_PROMPT_AGENT_CORE",
+    "build_planner_prompt",
+    "build_investigation_prompt",
+    "build_fixer_prompt",
+    "build_reporter_prompt",
 ]

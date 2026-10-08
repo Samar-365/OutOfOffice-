@@ -1,4 +1,4 @@
-"""Core settings, database, and telemetry utilities."""
+"""Core settings, database, events, and telemetry utilities."""
 from .config import settings
 from .database import (
     Base,
@@ -23,6 +23,12 @@ from .models import (
     FindingCategory,
     DiffStatus,
 )
+from .events import (
+    EventType,
+    AgentEvent,
+    ConnectionManager,
+    event_bus,
+)
 
 __all__ = [
     "settings",
@@ -45,4 +51,8 @@ __all__ = [
     "FindingSeverity",
     "FindingCategory",
     "DiffStatus",
+    "EventType",
+    "AgentEvent",
+    "ConnectionManager",
+    "event_bus",
 ]

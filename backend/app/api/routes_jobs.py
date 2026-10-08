@@ -10,8 +10,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.api.schemas import JobCreateRequest, JobResponse
+from app.core.config import settings
 from app.core.database import get_async_db
 from app.core.events import EventType, event_bus
+from app.integrations.ollama_client import ollama_client
 from app.core.models import (
     AudioBriefing,
     CodeDiff,
@@ -23,6 +25,19 @@ from app.core.models import (
 )
 
 router = APIRouter(prefix="/jobs", tags=["Jobs"])
+
+
+@router.get("/models/status")
+async def get_models_status():
+    """Returns local Ollama inference status and installed models."""
+    is_running = await ollama_client.is_running_async()
+    installed = ollama_client.list_local_models() if is_running else []
+    return {
+        "ollama_running": is_running,
+        "default_model": settings.DEFAULT_MODEL,
+        "installed_models": installed,
+        "has_default_model": any(settings.DEFAULT_MODEL in m for m in installed),
+    }
 
 
 @router.post("", response_model=JobResponse, status_code=status.HTTP_201_CREATED)

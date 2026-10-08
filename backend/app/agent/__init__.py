@@ -17,6 +17,7 @@ from .prompts import (
     build_reporter_prompt,
 )
 from .state import AgentState, create_initial_agent_state
+from .graph import AgentWorkflow, agent_workflow
 
 __all__ = [
     "PlanItem",
@@ -34,4 +35,6 @@ __all__ = [
     "build_reporter_prompt",
     "AgentState",
     "create_initial_agent_state",
+    "AgentWorkflow",
+    "agent_workflow",
 ]

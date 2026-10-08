@@ -6,6 +6,7 @@ from .dependency_auditor import audit_dependencies
 from .git_manager import GitManager
 from .test_runner import TestResult, run_test_suite
 from .linter_runner import LintIssue, run_static_analysis
+from .patcher import PatchResult, apply_surgical_patch, rollback_patch, generate_unified_diff
 
 __all__ = [
     "discover_repository",
@@ -22,4 +23,8 @@ __all__ = [
     "run_test_suite",
     "LintIssue",
     "run_static_analysis",
+    "PatchResult",
+    "apply_surgical_patch",
+    "rollback_patch",
+    "generate_unified_diff",
 ]

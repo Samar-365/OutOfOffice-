@@ -1,0 +1,203 @@
+# Software Requirements Specification (SRS)
+# OutOfOffice AI — Local Autonomous Coding Agent
+**Version:** 1.1  
+**Project Type:** Local-First Autonomous AI Developer Agent  
+**Hackathon Event:** Hacktoberfest Open-Source AI Challenge (Week 1: "Touch Grass")  
+**Dates:** October 5 – October 11, 2026  
+**DEV Challenge Tags:** `#devchallenge`, `#hf26challenge`  
+**Primary Goal:** Delegate repository analysis, test execution, and safe refactoring to a local open-weight AI agent so developers can close their screens, go touch grass, and return to verified, production-ready work.
+
+---
+
+## 1. Introduction
+
+### 1.1 Purpose & Narrative
+Developers spend hours tethered to screens babysitting repetitive codebase workflows: dead-code pruning, test runs, lint fixing, dependency audits, and static analysis. Existing cloud-based AI assistants demand continuous chat supervision, cost per-token API fees, and compromise source code privacy.
+
+**OutOfOffice AI** flips the paradigm:
+1. Select a local Git repository and enter a task (e.g., *"Analyze this repo, find dead code, run test suites, and fix safe issues"*).
+2. Click **"🌳 GO TOUCH GRASS"** and close the laptop or browser.
+3. The local agent autonomously plans, inspects the AST, executes tests, searches references, isolates fixes onto a dedicated Git branch, validates builds, and records durable traces.
+4. When you return from outside, receive an executive audio briefing (powered by ElevenLabs) and an interactive results dashboard with verifiable Git diffs, test logs, and health metrics.
+
+**Core Philosophy:** *Screen time should be the shortest part of development. Give your code a job. Go touch grass. Come back to verified results.*
+
+---
+
+## 2. Hackathon & Challenge Alignment
+
+### 2.1 Week 1 Theme: "Touch Grass"
+The challenge asks participants to build open-weight/open-source AI projects that get people off screens and into the physical world. 
+- **Screen Minimization:** OutOfOffice AI is designed explicitly for *asynchronous, headless execution*. Interaction time is capped under 60 seconds (Job Launch $\rightarrow$ Screen Close $\rightarrow$ Review on Return).
+- **Away-Time Tracker:** Built-in "Grass Touched" timer tracking developer away-time vs. compute time.
+- **Completion Briefing:** Audio summary on return so developers don't have to read dense logs immediately.
+
+### 2.2 Open Innovation & Open-Source AI Thesis
+- **Zero Cloud Leakage:** Proprietary code never leaves localhost.
+- **Model Agnostic & Fine-Tunable:** Powered by open-weight models (Gemma 2 / CodeGemma via Ollama) with zero API lock-in and zero per-token cost.
+- **Offline Capable:** Full autonomous capabilities without internet connectivity.
+
+### 2.3 Targeted Partner Prize Categories
+| Category | Integration & Role in OutOfOffice AI |
+| :--- | :--- |
+| **Best Use of Gemma** *(Primary)* | Uses Google's **Gemma 2 / CodeGemma** via local Ollama inference as the primary agent reasoning engine for planning, AST analysis, and code synthesis. |
+| **Best Use of Sentry Agent Tracing** | Integrates Sentry distributed agent tracing to record tool latency, token consumption, error recoveries, and step-by-step reasoning graphs. |
+| **Best Use of ElevenLabs** | Generates an audio briefing summarizing the completed run when the developer returns (*"Welcome back! While you spent 42 minutes outside, I analyzed 142 files..."*). |
+| **Best Use of Temporal** *(Durable Agent Execution)* | Orchestrates the agent execution loop in durable workflows that survive machine sleep, network drops, and handle automatic tool retries. |
+
+---
+
+## 3. High-Level System Architecture
+
+```
+                             DEVELOPER
+                                 │
+                 [1. Select Repo & Task]
+                 [2. Click "GO TOUCH GRASS"]
+                                 │
+                                 ▼
+                     ┌───────────────────────┐
+                     │ React + Vite Frontend │ ◄── (Can be closed anytime)
+                     └───────────┬───────────┘
+                                 │ REST / WebSocket
+                                 ▼
+                     ┌───────────────────────┐
+                     │    FastAPI Backend    │
+                     └───────────┬───────────┘
+                                 │
+                                 ▼
+                     ┌───────────────────────┐
+                     │  Temporal / Background│
+                     │      Job Manager      │
+                     └───────────┬───────────┘
+                                 │
+                                 ▼
+                     ┌───────────────────────┐
+                     │    LangGraph Agent    │
+                     │    Reasoning Engine   │
+                     └───────────┬───────────┘
+                                 │
+     ┌───────────────────────────┼───────────────────────────┐
+     │                           │                           │
+     ▼                           ▼                           ▼
+┌──────────────┐          ┌──────────────┐          ┌────────────────┐
+│ Ollama/Gemma │          │  Repo Tools  │          │  Git Engine    │
+│ (Local LLM)  │          │(Files/Tests) │          │ (Branch/Diff)  │
+└──────────────┘          └──────────────┘          └────────────────┘
+     │                           │                           │
+     └───────────────────────────┼───────────────────────────┘
+                                 │
+                                 ▼
+                     ┌───────────────────────┐
+                     │    SQLite Database    │
+                     │  (State & Findings)   │
+                     └───────────┬───────────┘
+                                 │
+     ┌───────────────────────────┼───────────────────────────┐
+     ▼                           ▼                           ▼
+┌──────────────┐          ┌──────────────┐          ┌────────────────┐
+│ Sentry Trace │          │ ElevenLabs   │          │ Final Report & │
+│ (Telemetry)  │          │ Audio Brief  │          │ Diff Artifacts │
+└──────────────┘          └──────────────┘          └────────────────┘
+```
+
+---
+
+## 4. Technology Stack
+
+| Layer | Technology | Purpose |
+| :--- | :--- | :--- |
+| **Frontend UI** | React 18, Vite, TypeScript, TailwindCSS / Lucide | Intuitive 4-screen workflow, live grass timer, diff viewer, trace visualizer. |
+| **Backend API** | Python 3.11+, FastAPI, Uvicorn, WebSockets | Async task scheduling, repo management, real-time event streaming. |
+| **Agent Orchestration** | LangGraph & LangChain | Cyclic graph-based planning, investigation, and verification loops. |
+| **Local LLM Inference** | Ollama (Gemma 2 / CodeGemma / Qwen 2.5 Coder) | 100% offline, privacy-first local code comprehension and generation. |
+| **Observability** | Sentry Agent Tracing SDK | Agent performance tracking, latency waterfalls, token metrics, and execution graphs. |
+| **Voice Briefing** | ElevenLabs API / Local TTS | Welcome-back voice narration of completed tasks and health metrics. |
+| **Workflow Engine** | Temporal Python SDK / Background Worker | Resilient job execution surviving process interruptions and UI closures. |
+| **Code Tools & Search** | `ripgrep`, Tree-sitter AST, pytest, npm/jest | Fast code discovery, reference mapping, syntax verification, and test execution. |
+| **Persistence** | SQLite / SQLAlchemy | Structured job history, findings ledger, diff store, and execution logs. |
+
+---
+
+## 5. Functional Requirements
+
+### 5.1 Repository & Project Discovery
+* **FR-01 (Repo Intake):** Select local file path; validate Git repo existence, branch status, and write permissions.
+* **FR-02 (Discovery Engine):** Detect project manifest (`package.json`, `pyproject.toml`, `Cargo.toml`, etc.), framework, language version, and available test scripts (`npm test`, `pytest`, `cargo test`).
+
+### 5.2 Planning & Agentic Execution
+* **FR-03 (Goal Decomposition):** Translate natural language prompts into structured step-by-step execution plans.
+* **FR-04 (Tool Harness):** Controlled tool interface:
+  * `read_file(path, line_range)`
+  * `search_code(pattern, glob)`
+  * `list_symbols(file_path)` (Tree-sitter AST)
+  * `run_tests(test_filter)`
+  * `run_linter()` / `run_typecheck()`
+  * `apply_patch(file_path, diff)`
+  * `git_status()` / `git_diff()` / `git_checkout_branch()`
+* **FR-05 (Autonomous Investigation Loop):** When a test or type check fails, dynamically inspect error stack traces, trace callers/callees, and isolate root causes before attempting patches.
+
+### 5.3 Modes of Operation & Safety
+* **FR-06 (Audit Mode — Default):** Read-only analysis, test execution, finding generation, and recommendations. Zero code mutations.
+* **FR-07 (Fix Mode):** 
+  * Automatically isolates work by creating a branch: `agent/outofoffice-<timestamp>`.
+  * Generates isolated surgical diffs.
+  * Re-runs the test suite and type checker to validate fixes.
+  * Rolls back changes if test regression occurs.
+  * Never pushes to remote Git origins automatically.
+
+### 5.4 Background Resilience ("Touch Grass" Execution)
+* **FR-08 (Headless Execution):** Job execution runs decoupled in background worker threads/Temporal workflows.
+* **FR-09 (State Re-hydration):** Closing the browser or shutting down the UI does not terminate running jobs. Reopening the web UI queries SQLite to re-hydrate the exact step and progress state.
+* **FR-10 (Away-Time Tracking):** Records timestamps from job start $\rightarrow$ completion, computing total "Grass Touched" minutes.
+
+### 5.5 Completion Artifacts & Audio Briefing
+* **FR-11 (Health & Findings Matrix):** Categorizes findings by severity (`HIGH`, `MEDIUM`, `LOW`) and status (`Detected Fact` vs. `AI Recommendation`).
+* **FR-12 (Interactive Diff & Evidence Viewer):** Displays visual unified diffs with line-by-line syntax highlighting and associated test proof.
+* **FR-13 (Audio Briefing Generation):** Generates a 30-second audio recap via ElevenLabs summarizing test outcomes, files modified, and issues resolved upon UI reopen.
+* **FR-14 (Sentry Trace Export):** Generates exportable trace logs showing agent decision steps and tool execution latency.
+
+---
+
+## 6. Non-Functional Requirements
+
+* **NFR-01 (Privacy & Air-Gap Ready):** All repository code and AST structures must remain strictly on local storage.
+* **NFR-02 (Local Model Optimization):** Inference must execute smoothly on consumer hardware (e.g., Apple Silicon M-series, Nvidia RTX 3060+ or 16GB+ RAM CPU with quantized Gemma).
+* **NFR-03 (Fault Tolerance):** Flaky commands or non-zero exit codes must be caught and fed back into the agent context rather than crashing the system.
+* **NFR-04 (Traceability):** Every patch must link directly to an executed test command and AST reference verification.
+
+---
+
+## 7. UI / UX Design & Screen Flow
+
+### Screen 1: Mission Control (Dashboard)
+* Repository picker & active Git branch display.
+* Task input prompt (with quick templates: *Dead Code Cleanup*, *Test Suite Fixes*, *Dependency Audit*).
+* Mode Switcher: `[ Audit Mode (Safe) ]` | `[ Fix Mode (Branch Isolated) ]`.
+* Hero Action: **`[ 🌳 GO TOUCH GRASS ]`** button.
+
+### Screen 2: "Touch Grass" Away Screen
+* Calming, minimalist aesthetic with live outdoor timer (*"Away for 00:24:18"*).
+* Dynamic status line (*"Agent is analyzing AST references in background..."*).
+* Friendly reminder: *"You can safely close this window. Your agent is working locally."*
+
+### Screen 3: Agent Trace & Telemetry
+* Live step-by-step LangGraph node execution graph.
+* Sentry trace waterfall showing tool latencies, tokens processed, and terminal outputs.
+
+### Screen 4: Results & Welcome-Back Hub
+* **Welcome-Back Audio Player:** ElevenLabs synthesized voice debrief.
+* **Repository Health Score:** (e.g., `88/100 (+6)`).
+* **Test Verification Badge:** `47 / 47 Passed (2 Fixed)`.
+* **Git Branch & Unified Diff Viewer:** Clean review of modifications on `agent/outofoffice-*`.
+* **Action Buttons:** `[ Merge to Current Branch ]` | `[ Discard Branch ]` | `[ Export DEV.to Writeup ]`.
+
+---
+
+## 8. Hackathon Submission & DEV.to Publishing Checklist
+
+- [ ] **DEV.to Post Draft** using the official `#hf26challenge` & `#devchallenge` templates.
+- [ ] **Demo Video / WebP Walkthrough:** Showing the launch $\rightarrow$ UI close $\rightarrow$ background execution $\rightarrow$ return to verified diffs.
+- [ ] **Gemma Integration Documentation:** Showing local Ollama prompt structures and reasoning logs.
+- [ ] **Sentry Trace Screenshots:** Embedding agent performance traces.
+- [ ] **Open Innovation Narrative:** Explaining why local, open-source AI is the future of developer privacy and work-life balance.

@@ -128,8 +128,8 @@ class Job(Base):
     )
 
     def to_dict(self) -> Dict[str, Any]:
-        """Serializes Job object to dictionary."""
-        return {
+        """Serializes Job object to dictionary safely with async SQLAlchemy."""
+        d = {
             "id": self.id,
             "repo_path": self.repo_path,
             "task_prompt": self.task_prompt,
@@ -144,11 +144,12 @@ class Job(Base):
             "started_at": self.started_at.isoformat() if self.started_at else None,
             "finished_at": self.finished_at.isoformat() if self.finished_at else None,
             "away_duration_seconds": self.away_duration_seconds,
-            "step_count": len(self.steps) if self.steps else 0,
-            "finding_count": len(self.findings) if self.findings else 0,
-            "diff_count": len(self.diffs) if self.diffs else 0,
-            "has_audio": self.audio_briefing is not None,
+            "step_count": len(self.steps) if "steps" in self.__dict__ and self.steps else 0,
+            "finding_count": len(self.findings) if "findings" in self.__dict__ and self.findings else 0,
+            "diff_count": len(self.diffs) if "diffs" in self.__dict__ and self.diffs else 0,
+            "has_audio": "audio_briefing" in self.__dict__ and self.audio_briefing is not None,
         }
+        return d
 
 
 class JobStep(Base):

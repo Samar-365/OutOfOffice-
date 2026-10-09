@@ -14,6 +14,7 @@ from app.core.config import settings
 from app.core.database import get_async_db
 from app.core.events import EventType, event_bus
 from app.integrations.ollama_client import ollama_client
+from app.integrations.sentry_telemetry import sentry_tracer
 from app.services.job_runner import job_runner
 from app.services.persistence import persistence_service
 from app.services.timer_service import timer_service
@@ -225,5 +226,13 @@ async def get_job_grass_metrics(job_id: str, db: AsyncSession = Depends(get_asyn
 
     metrics = timer_service.compute_grass_metrics(job_id, job.away_duration_seconds)
     return metrics
+
+
+@router.get("/{job_id}/traces")
+async def get_job_traces(job_id: str):
+    """Returns Sentry agent tracing waterfall telemetry for latency and step analysis."""
+    traces = sentry_tracer.export_waterfall(job_id)
+    return traces
+
 
 

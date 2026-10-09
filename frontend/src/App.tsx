@@ -1,131 +1,65 @@
 import React, { useState } from 'react';
 import { Navbar } from './components/Navbar';
-import { Trees, Cpu, Terminal, ArrowRight } from 'lucide-react';
+import { Dashboard } from './views/Dashboard';
+import { Trees } from 'lucide-react';
 
 export const App: React.FC = () => {
   const [activeScreen, setActiveScreen] = useState<'dashboard' | 'away' | 'trace' | 'results'>('dashboard');
-  const [selectedMode, setSelectedMode] = useState<'AUDIT' | 'FIX'>('AUDIT');
 
   return (
     <div className="min-h-screen flex flex-col bg-dark-bg text-slate-100">
       <Navbar activeScreen={activeScreen} onNavigate={setActiveScreen} />
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Design System & Theme Showcase */}
-        <div className="space-y-8">
-          {/* Hero Branding Banner */}
-          <div className="glass-panel p-8 sm:p-10 relative overflow-hidden border border-forest-600/30">
-            <div className="absolute top-0 right-0 w-96 h-96 bg-grass-neon/5 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20"></div>
-            <div className="relative z-10 max-w-3xl">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-forest-900/80 border border-grass-neon/30 text-grass-neon text-xs font-semibold mb-4 shadow-sm">
-                <Trees className="h-3.5 w-3.5" /> Hacktoberfest 2026: "Touch Grass" Edition
-              </div>
-              <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-white mb-4 leading-tight">
-                Give your code a job. <br />
-                <span className="text-glow-gradient">Go touch grass.</span>
-              </h1>
-              <p className="text-slate-300 text-base sm:text-lg leading-relaxed mb-6 font-normal">
-                Autonomous local-first AI coding agent powered by Google Gemma 2. Plans AST refactoring, executes test suites, applies isolated Git patches, and debriefs you with ElevenLabs voice narration upon your return.
-              </p>
-              
-              <div className="flex flex-wrap items-center gap-4">
-                <button
-                  onClick={() => alert("Touch Grass mode activated!")}
-                  className="btn-touch-grass animate-grass-pulse cursor-pointer"
-                >
-                  <Trees className="h-5 w-5" />
-                  <span>[ 🌳 GO TOUCH GRASS ]</span>
-                </button>
-                <button
-                  onClick={() => setActiveScreen('trace')}
-                  className="btn-secondary cursor-pointer"
-                >
-                  <Terminal className="h-4 w-4 text-grass-neon" />
-                  <span>View Telemetry Trace</span>
-                  <ArrowRight className="h-4 w-4 ml-1" />
-                </button>
-              </div>
-            </div>
+        {activeScreen === 'dashboard' && (
+          <Dashboard onNavigate={setActiveScreen} />
+        )}
+
+        {activeScreen === 'away' && (
+          <div className="glass-card p-12 text-center space-y-4 max-w-2xl mx-auto border border-forest-700/50">
+            <Trees className="h-16 w-16 text-grass-neon mx-auto animate-bounce" />
+            <h2 className="text-2xl font-bold text-white">Headless Away Screen (Submodule 8.4)</h2>
+            <p className="text-sm text-slate-400">
+              Live grass timer and relaxing outdoor freedom status will be rendered here.
+            </p>
+            <button
+              onClick={() => setActiveScreen('trace')}
+              className="btn-secondary text-xs px-4 py-2"
+            >
+              View Telemetry Trace
+            </button>
           </div>
+        )}
 
-          {/* Design Tokens & Theme Components Preview Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Card 1: Mode Switcher */}
-            <div className="glass-card p-6 flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-xs font-mono uppercase tracking-wider text-slate-400">Execution Mode</span>
-                  <span className="badge-grass">Deterministic</span>
-                </div>
-                <h3 className="text-lg font-bold text-white mb-2">Safety Sandbox</h3>
-                <p className="text-xs text-slate-400 mb-4">
-                  Switch between read-only audit inspections and isolated Git branch repairs.
-                </p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-2 bg-dark-input p-1.5 rounded-xl border border-forest-800/60">
-                <button
-                  onClick={() => setSelectedMode('AUDIT')}
-                  className={`py-2 px-3 rounded-lg text-xs font-bold transition-all ${
-                    selectedMode === 'AUDIT'
-                      ? 'bg-forest-700 text-white shadow-sm'
-                      : 'text-slate-400 hover:text-white'
-                  }`}
-                >
-                  🛡️ Audit Mode
-                </button>
-                <button
-                  onClick={() => setSelectedMode('FIX')}
-                  className={`py-2 px-3 rounded-lg text-xs font-bold transition-all ${
-                    selectedMode === 'FIX'
-                      ? 'bg-amber-600/80 text-white shadow-sm'
-                      : 'text-slate-400 hover:text-white'
-                  }`}
-                >
-                  ⚡ Fix Mode
-                </button>
-              </div>
-            </div>
-
-            {/* Card 2: Local AI Inference Core */}
-            <div className="glass-card p-6 flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-xs font-mono uppercase tracking-wider text-slate-400">Local AI Engine</span>
-                  <span className="badge-grass">100% Offline</span>
-                </div>
-                <h3 className="text-lg font-bold text-white mb-2">Google Gemma 2 Core</h3>
-                <p className="text-xs text-slate-400 mb-4">
-                  Structured JSON schemas strictly enforced with zero external API fees or telemetry leak.
-                </p>
-              </div>
-
-              <div className="flex items-center gap-2 p-2.5 rounded-lg bg-forest-950/60 border border-forest-800/40 font-mono text-xs text-grass-neon">
-                <Cpu className="h-4 w-4" />
-                <span>Ollama daemon: gemma2:9b active</span>
-              </div>
-            </div>
-
-            {/* Card 3: Touch Grass Metrics Badge */}
-            <div className="glass-card p-6 flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-xs font-mono uppercase tracking-wider text-slate-400">Outdoor Freedom</span>
-                  <span className="badge-grass">🌳 Park Ranger</span>
-                </div>
-                <h3 className="text-lg font-bold text-white mb-2">Away-Time Tracker</h3>
-                <p className="text-xs text-slate-400 mb-4">
-                  Computes developer screen-freedom duration and synthesizes audio voice debriefs.
-                </p>
-              </div>
-
-              <div className="flex items-center justify-between p-2.5 rounded-lg bg-forest-950/60 border border-forest-800/40 font-mono text-xs">
-                <span className="text-slate-400">Grass Touched:</span>
-                <span className="text-grass-neon font-bold">00:24:18 (2,400 steps)</span>
-              </div>
-            </div>
+        {activeScreen === 'trace' && (
+          <div className="glass-card p-12 text-center space-y-4 max-w-2xl mx-auto border border-forest-700/50">
+            <h2 className="text-2xl font-bold text-white">Agent Telemetry Visualizer (Submodule 8.5)</h2>
+            <p className="text-sm text-slate-400">
+              Real-time LangGraph step timeline and Sentry waterfall traces will be rendered here.
+            </p>
+            <button
+              onClick={() => setActiveScreen('dashboard')}
+              className="btn-secondary text-xs px-4 py-2"
+            >
+              Back to Dashboard
+            </button>
           </div>
-        </div>
+        )}
+
+        {activeScreen === 'results' && (
+          <div className="glass-card p-12 text-center space-y-4 max-w-2xl mx-auto border border-forest-700/50">
+            <h2 className="text-2xl font-bold text-white">Results Hub & Unified Diff (Submodule 8.6)</h2>
+            <p className="text-sm text-slate-400">
+              ElevenLabs audio debrief player and verified code diffs will be rendered here.
+            </p>
+            <button
+              onClick={() => setActiveScreen('dashboard')}
+              className="btn-secondary text-xs px-4 py-2"
+            >
+              Back to Dashboard
+            </button>
+          </div>
+        )}
       </main>
 
       {/* Footer */}
@@ -145,3 +79,4 @@ export const App: React.FC = () => {
 };
 
 export default App;
+

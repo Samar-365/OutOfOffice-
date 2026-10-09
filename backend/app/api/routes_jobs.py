@@ -16,6 +16,7 @@ from app.core.events import EventType, event_bus
 from app.integrations.ollama_client import ollama_client
 from app.services.job_runner import job_runner
 from app.services.persistence import persistence_service
+from app.services.timer_service import timer_service
 from app.core.models import (
     AudioBriefing,
     CodeDiff,
@@ -204,4 +205,25 @@ async def get_job_timeline(job_id: str):
     """Returns chronologically ordered execution steps for waterfall timeline visualizers."""
     timeline = await persistence_service.get_job_timeline(job_id)
     return {"job_id": job_id, "timeline": timeline}
+
+
+@router.get("/community/grass-stats")
+async def get_community_grass_stats():
+    """Aggregates all-time 'Touch Grass' metrics across all completed jobs."""
+    stats = await timer_service.get_all_time_stats()
+    return stats
+
+
+@router.get("/{job_id}/grass-metrics")
+async def get_job_grass_metrics(job_id: str, db: AsyncSession = Depends(get_async_db)):
+    """Computes gamified outdoor away metrics and badges for a specific job."""
+    stmt = select(Job).filter(Job.id == job_id)
+    res = await db.execute(stmt)
+    job = res.scalar_one_or_none()
+    if not job:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Job not found: {job_id}")
+
+    metrics = timer_service.compute_grass_metrics(job_id, job.away_duration_seconds)
+    return metrics
+
 

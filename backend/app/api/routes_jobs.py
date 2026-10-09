@@ -15,6 +15,7 @@ from app.core.database import get_async_db
 from app.core.events import EventType, event_bus
 from app.integrations.ollama_client import ollama_client
 from app.services.job_runner import job_runner
+from app.services.persistence import persistence_service
 from app.core.models import (
     AudioBriefing,
     CodeDiff,
@@ -187,3 +188,20 @@ async def cancel_job(job_id: str, db: AsyncSession = Depends(get_async_db)):
         await event_bus.emit(EventType.JOB_CANCELLED, job_id=job.id, data={"status": job.status})
 
     return JobResponse(**job.to_dict())
+
+
+@router.get("/{job_id}/rehydrate")
+async def rehydrate_job_state(job_id: str):
+    """Rehydrates complete historical timeline and durable state for a returning user."""
+    data = await persistence_service.rehydrate_job(job_id)
+    if not data:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Job not found: {job_id}")
+    return data
+
+
+@router.get("/{job_id}/timeline")
+async def get_job_timeline(job_id: str):
+    """Returns chronologically ordered execution steps for waterfall timeline visualizers."""
+    timeline = await persistence_service.get_job_timeline(job_id)
+    return {"job_id": job_id, "timeline": timeline}
+

@@ -1,17 +1,18 @@
 import React from 'react';
 import { Trees, Sparkles, Activity, ShieldCheck } from 'lucide-react';
+import { useJob } from '../context/JobContext';
 
 interface NavbarProps {
   activeScreen?: 'dashboard' | 'away' | 'trace' | 'results';
   onNavigate?: (screen: 'dashboard' | 'away' | 'trace' | 'results') => void;
-  ollamaOnline?: boolean;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
   activeScreen = 'dashboard',
   onNavigate,
-  ollamaOnline = true,
 }) => {
+  const { modelsStatus, activeJob } = useJob();
+  const ollamaOnline = modelsStatus?.ollama_running ?? true;
   return (
     <header className="sticky top-0 z-50 w-full border-b border-forest-800/40 bg-dark-bg/80 backdrop-blur-xl">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
@@ -84,6 +85,17 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         {/* Live Status Indicators */}
         <div className="flex items-center gap-3">
+          {activeJob && (
+            <div 
+              onClick={() => onNavigate && onNavigate('away')}
+              className="cursor-pointer hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-forest-950/80 border border-grass-neon/30 text-xs font-mono"
+            >
+              <span className="h-2 w-2 rounded-full bg-grass-neon animate-pulse"></span>
+              <span className="text-slate-300">JOB #{activeJob.id.slice(0, 8)}</span>
+              <span className="badge-grass uppercase text-[10px]">{activeJob.status}</span>
+            </div>
+          )}
+
           <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-forest-900/50 border border-forest-800/40">
             <span className="relative flex h-2.5 w-2.5">
               <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${ollamaOnline ? 'bg-grass-neon' : 'bg-amber-400'}`}></span>

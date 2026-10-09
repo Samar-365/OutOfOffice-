@@ -3,6 +3,7 @@ import { Navbar } from './components/Navbar';
 import { Dashboard } from './views/Dashboard';
 import { AwayScreen } from './views/AwayScreen';
 import { TraceView } from './views/TraceView';
+import { ResultsHub } from './views/ResultsHub';
 import { Trees } from 'lucide-react';
 
 export const App: React.FC = () => {
@@ -26,18 +27,7 @@ export const App: React.FC = () => {
         )}
 
         {activeScreen === 'results' && (
-          <div className="glass-card p-12 text-center space-y-4 max-w-2xl mx-auto border border-forest-700/50">
-            <h2 className="text-2xl font-bold text-white">Results Hub & Unified Diff (Submodule 8.6)</h2>
-            <p className="text-sm text-slate-400">
-              ElevenLabs audio debrief player and verified code diffs will be rendered here.
-            </p>
-            <button
-              onClick={() => setActiveScreen('dashboard')}
-              className="btn-secondary text-xs px-4 py-2"
-            >
-              Back to Dashboard
-            </button>
-          </div>
+          <ResultsHub onNavigate={setActiveScreen} />
         )}
       </main>
 

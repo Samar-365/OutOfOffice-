@@ -1,0 +1,10 @@
+[project]
+name = "sample-python-repo"
+version = "0.1.0"
+description = "Sample Python repository for OutOfOffice AI verification"
+dependencies = [
+    "pytest>=8.0.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

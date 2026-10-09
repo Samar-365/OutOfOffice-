@@ -15,7 +15,9 @@ from app.agent.graph import agent_workflow
 from app.agent.state import AgentState
 from app.core.database import get_async_session_factory
 from app.core.events import EventType, event_bus
+from app.integrations.elevenlabs_brief import elevenlabs_generator
 from app.core.models import (
+    AudioBriefing,
     CodeDiff,
     DiffStatus,
     Finding,
@@ -319,6 +321,29 @@ class JobRunner:
                     status=str(status_val),
                 )
                 session.add(diff_obj)
+
+            # Generate and Save Audio Briefing
+            voice_script = state.get("voice_script")
+            if voice_script:
+                try:
+                    audio_res = await elevenlabs_generator.generate_voice_briefing(job_id, voice_script)
+                    if audio_res:
+                        briefing = AudioBriefing(
+                            job_id=job_id,
+                            audio_path=audio_res["audio_path"],
+                            script_text=audio_res["script_text"],
+                            duration_seconds=audio_res.get("duration_seconds"),
+                            provider=audio_res.get("provider", "elevenlabs"),
+                            created_at=datetime.utcnow(),
+                        )
+                        session.add(briefing)
+                        await event_bus.emit(
+                            EventType.AUDIO_READY,
+                            job_id=job_id,
+                            data={"job_id": job_id, "audio_path": audio_res["audio_path"], "duration_seconds": audio_res.get("duration_seconds")},
+                        )
+                except Exception as audio_err:
+                    logger.warning(f"[{job_id}] Audio briefing generation failed: {audio_err}")
 
             await session.commit()
 

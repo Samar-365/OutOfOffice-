@@ -4,7 +4,7 @@ import os
 from pathlib import Path
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, WebSocket, WebSocketDisconnect, status
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, StreamingResponse
 from sqlalchemy import desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -13,6 +13,7 @@ from app.api.schemas import JobCreateRequest, JobResponse
 from app.core.config import settings
 from app.core.database import get_async_db
 from app.core.events import EventType, event_bus
+from app.integrations.audio_streamer import audio_streamer
 from app.integrations.ollama_client import ollama_client
 from app.integrations.sentry_telemetry import sentry_tracer
 from app.services.job_runner import job_runner
@@ -170,6 +171,49 @@ async def get_job_audio(job_id: str, db: AsyncSession = Depends(get_async_db)):
         media_type="audio/mpeg",
         filename=f"briefing-{job_id}.mp3",
     )
+
+
+@router.get("/{job_id}/audio/stream")
+async def stream_job_audio(job_id: str, db: AsyncSession = Depends(get_async_db)):
+    """Streams the audio briefing in chunks for responsive playback."""
+    query = select(AudioBriefing).filter(AudioBriefing.job_id == job_id)
+    result = await db.execute(query)
+    briefing = result.scalar_one_or_none()
+
+    if not briefing or not briefing.audio_path:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No audio briefing available for this job.")
+
+    audio_path = Path(briefing.audio_path)
+    if not audio_path.exists():
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Audio file not found on disk.")
+
+    return StreamingResponse(
+        audio_streamer.stream_file_chunks(audio_path),
+        media_type="audio/mpeg",
+        headers={"Content-Disposition": f'inline; filename="briefing-{job_id}.mp3"'},
+    )
+
+
+@router.get("/{job_id}/audio/strategy")
+async def get_job_audio_strategy(job_id: str, db: AsyncSession = Depends(get_async_db)):
+    """Resolves whether to use local MP3 file streaming or Web Speech API fallback for audio playback."""
+    query = select(Job).options(selectinload(Job.audio_briefing)).filter(Job.id == job_id)
+    result = await db.execute(query)
+    job = result.scalar_one_or_none()
+
+    if not job:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Job not found: {job_id}")
+
+    script = job.audio_briefing.script_text if job.audio_briefing else (job.final_report_markdown or "Task completed.")
+    audio_path = job.audio_briefing.audio_path if job.audio_briefing else None
+
+    strategy = audio_streamer.resolve_audio_strategy(
+        job_id=job_id,
+        script_text=script,
+        existing_audio_path=audio_path,
+    )
+    return strategy
+
 
 
 @router.post("/{job_id}/cancel", response_model=JobResponse)

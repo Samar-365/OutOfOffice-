@@ -14,6 +14,7 @@ from app.core.config import settings
 from app.core.database import get_async_db
 from app.core.events import EventType, event_bus
 from app.integrations.ollama_client import ollama_client
+from app.services.job_runner import job_runner
 from app.core.models import (
     AudioBriefing,
     CodeDiff,
@@ -77,6 +78,14 @@ async def create_job(payload: JobCreateRequest, db: AsyncSession = Depends(get_a
             "status": job.status,
             "created_at": job.created_at.isoformat(),
         },
+    )
+
+    # Launch background job execution decoupled from HTTP request lifecycle
+    await job_runner.start_job(
+        job_id=job.id,
+        repo_path=job.repo_path,
+        task_prompt=job.task_prompt,
+        mode=job.mode,
     )
 
     return JobResponse(**job.to_dict())
@@ -171,6 +180,7 @@ async def cancel_job(job_id: str, db: AsyncSession = Depends(get_async_db)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Job not found: {job_id}")
 
     if job.status in [JobStatus.RUNNING.value, JobStatus.QUEUED.value]:
+        await job_runner.cancel_job(job_id)
         job.status = JobStatus.CANCELLED.value
         await db.commit()
         await db.refresh(job)

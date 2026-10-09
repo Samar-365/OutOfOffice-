@@ -15,6 +15,7 @@ from app.api.schemas import HealthResponse
 from app.core.config import settings
 from app.core.database import init_db
 from app.core.events import EventType, event_bus
+from app.services.job_runner import job_runner
 
 # Configure Logging
 logging.basicConfig(
@@ -50,6 +51,7 @@ async def lifespan(app: FastAPI):
     logger.info(f"OutOfOffice AI v{settings.APP_VERSION} ready. Local model: {settings.DEFAULT_MODEL}")
     yield
     logger.info("Shutting down OutOfOffice AI backend...")
+    await job_runner.stop_all_jobs()
 
 
 app = FastAPI(

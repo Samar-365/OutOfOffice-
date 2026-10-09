@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Navbar } from './components/Navbar';
 import { Dashboard } from './views/Dashboard';
+import { AwayScreen } from './views/AwayScreen';
 import { Trees } from 'lucide-react';
 
 export const App: React.FC = () => {
@@ -16,19 +17,7 @@ export const App: React.FC = () => {
         )}
 
         {activeScreen === 'away' && (
-          <div className="glass-card p-12 text-center space-y-4 max-w-2xl mx-auto border border-forest-700/50">
-            <Trees className="h-16 w-16 text-grass-neon mx-auto animate-bounce" />
-            <h2 className="text-2xl font-bold text-white">Headless Away Screen (Submodule 8.4)</h2>
-            <p className="text-sm text-slate-400">
-              Live grass timer and relaxing outdoor freedom status will be rendered here.
-            </p>
-            <button
-              onClick={() => setActiveScreen('trace')}
-              className="btn-secondary text-xs px-4 py-2"
-            >
-              View Telemetry Trace
-            </button>
-          </div>
+          <AwayScreen onNavigate={setActiveScreen} />
         )}
 
         {activeScreen === 'trace' && (

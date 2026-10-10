@@ -45,6 +45,14 @@ class TestResult:
         self.stderr = stderr
         self.failing_tests = failing_tests or []
 
+    @property
+    def stdout_snippet(self) -> str:
+        return self.stdout[-2000:] if len(self.stdout) > 2000 else self.stdout
+
+    @property
+    def stderr_snippet(self) -> str:
+        return self.stderr[-2000:] if len(self.stderr) > 2000 else self.stderr
+
     def to_dict(self) -> Dict[str, Any]:
         """Serializes TestResult to dictionary."""
         return {
@@ -58,8 +66,8 @@ class TestResult:
             "duration_seconds": self.duration_seconds,
             "failing_tests": self.failing_tests,
             "summary": f"{self.passed}/{self.total} passed ({self.failed} failed, {self.skipped} skipped)" if self.total > 0 else "No test counts parsed",
-            "stdout_snippet": self.stdout[-2000:] if len(self.stdout) > 2000 else self.stdout,
-            "stderr_snippet": self.stderr[-2000:] if len(self.stderr) > 2000 else self.stderr,
+            "stdout_snippet": self.stdout_snippet,
+            "stderr_snippet": self.stderr_snippet,
         }
 
 

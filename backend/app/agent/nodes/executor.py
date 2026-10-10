@@ -73,7 +73,7 @@ async def executor_node(state: AgentState) -> Dict[str, Any]:
             tool_output = res.to_dict()
             updates["test_results"] = tool_output
             stdout_summary = f"Tests: {res.passed} passed, {res.failed} failed, {res.skipped} skipped"
-            stderr_summary = res.stderr_snippet
+            stderr_summary = getattr(res, "stderr_snippet", res.stderr)
 
         elif tool_name == "ast_parser":
             table = build_symbol_table(repo_path)

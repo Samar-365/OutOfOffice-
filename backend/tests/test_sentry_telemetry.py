@@ -33,7 +33,8 @@ def test_span_record_lifecycle():
     assert d["status"] == "ok"
 
 
-def test_sentry_init_fallback():
+def test_sentry_init_fallback(monkeypatch):
+    monkeypatch.setattr("app.integrations.sentry_telemetry.settings.SENTRY_DSN", None)
     manager = SentryTelemetryManager()
     # Initializing without DSN returns False and stays in local mode
     result = manager.init_sentry(dsn=None)

@@ -9,10 +9,9 @@
 ## Architecture Overview
 
 ```
-OutOfOffice AI Architecture
+OutofOffice AI Architecture
 ├── Frontend (React 18 + Vite + TypeScript + TailwindCSS)
 │   ├── Mission Control (Repo Selection, Task Config, Mode Switcher)
-│   ├── Away Screen (Live Grass Timer, Minimalist Calming Canvas)
 │   ├── Agent Trace Visualizer (Sentry Waterfall Spans & Logs)
 │   └── Results Hub (ElevenLabs Audio Player, Health Score, Diff Viewer)
 │
@@ -322,30 +321,22 @@ OutOfOffice AI Architecture
   * Repository Path Input with instant auto-validation and branch display.
   * Task Prompt Input with one-click presets (*"Find Dead Code & Prune"*, *"Fix Failing Tests"*, *"Full Repository Audit"*).
   * Mode Switcher: **Audit Mode** (Safe, Read-Only) vs **Fix Mode** (Isolated Branch Fixes).
-  * Hero Call-to-Action: **`[ 🌳 GO TOUCH GRASS ]`** pulsing green button.
+  * Hero Call-to-Action: **`[ Launch Task & View Telemetry ]`** button.
 
-### 8.4 Screen 2: Headless Away Screen & Grass Timer
-* **File:** `frontend/src/views/AwayScreen.tsx`
-* **Responsibilities:**
-  * Minimalist, relaxing full-screen view.
-  * Live **Grass Touched Timer** counting up in real-time (`00:14:32`).
-  * Subtle background status ticker (*"Agent is running static analysis..."*).
-  * Clear reassuring badge: *"You can safely close this tab or lock your computer. Your local agent is working."*
-
-### 8.5 Screen 3: Live Agent Trace & Telemetry Visualizer
+### 8.4 Screen 2: Live Agent Trace & Telemetry Visualizer
 * **File:** `frontend/src/views/TraceView.tsx`
 * **Responsibilities:**
   * Chronological execution timeline showing each completed step, tool invoked, and latency.
   * Expandable raw stdout/stderr terminal log drawers.
-  * Sentry trace waterfall preview.
+  * Sentry trace waterfall preview and filter queries.
 
-### 8.6 Screen 4: Results Hub, Unified Diff Viewer & Audio Player
+### 8.5 Screen 3: Results Hub, Unified Diff Viewer & Audio Player
 * **File:** `frontend/src/views/ResultsHub.tsx`
 * **Responsibilities:**
-  * **ElevenLabs Welcome-Back Audio Player**: Visual waveform audio player with auto-play or click-to-listen.
-  * **Repository Health Score Card**: Large radial progress meter (e.g. `88/100`).
-  * **Test Verification Badge**: Pass/Fail summary with green checkmark proof.
-  * **Interactive Unified Diff Viewer**: Syntax-highlighted side-by-side or unified diffs on `agent/outofoffice-*`.
+  * **ElevenLabs Welcome-Back Audio Player**: Visual audio player with playback controls.
+  * **Repository Health Score Card**: Numerical score meter (e.g. `92/100`).
+  * **Test Verification**: Pass/Fail summary with test suite proof on isolated branch.
+  * **Interactive Unified Diff Viewer**: Syntax-highlighted unified diffs on `agent/outofoffice-*`.
   * **Action Bar**: `[ Merge Branch ]`, `[ Discard Branch ]`, and `[ Copy DEV.to Summary ]`.
 
 ---

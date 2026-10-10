@@ -1,7 +1,6 @@
 /**
  * Screen 4: Results Hub, Unified Diff Viewer & Audio Player
- * Displays ElevenLabs voice debrief, repository health score meter,
- * interactive unified code diffs, executive markdown report, and DEV.to export.
+ * Flat, minimalist, professional developer UI with zero emojis.
  */
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -9,7 +8,6 @@ import { useJob } from '../context/JobContext';
 import { api } from '../services/api';
 import { AudioStrategy, CodeDiff } from '../types';
 import {
-  Trees,
   Volume2,
   Play,
   Pause,
@@ -23,16 +21,16 @@ import {
   ShieldCheck,
   Award,
   Share2,
+  Clock,
 } from 'lucide-react';
 
 interface ResultsHubProps {
-  onNavigate: (screen: 'dashboard' | 'away' | 'trace' | 'results') => void;
+  onNavigate: (screen: 'dashboard' | 'trace' | 'results') => void;
 }
 
 export const ResultsHub: React.FC<ResultsHubProps> = ({ onNavigate }) => {
   const { activeJob, grassMetrics } = useJob();
 
-  // Audio Player State
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [audioStrategy, setAudioStrategy] = useState<AudioStrategy | null>(null);
   const [audioDuration, setAudioDuration] = useState<number>(0);
@@ -43,7 +41,6 @@ export const ResultsHub: React.FC<ResultsHubProps> = ({ onNavigate }) => {
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  // Fetch audio playback strategy
   useEffect(() => {
     if (activeJob?.id) {
       api.getAudioStrategy(activeJob.id)
@@ -52,7 +49,6 @@ export const ResultsHub: React.FC<ResultsHubProps> = ({ onNavigate }) => {
     }
   }, [activeJob?.id]);
 
-  // Audio control handlers
   const handleTogglePlay = () => {
     if (!audioStrategy) return;
 
@@ -61,7 +57,7 @@ export const ResultsHub: React.FC<ResultsHubProps> = ({ onNavigate }) => {
         window.speechSynthesis.cancel();
         setIsPlaying(false);
       } else {
-        const text = audioStrategy.payload?.text || activeJob?.audio_briefing?.script_text || 'Welcome back from touching grass!';
+        const text = audioStrategy.payload?.text || activeJob?.audio_briefing?.script_text || 'Welcome back. Your tasks have completed.';
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.rate = 1.0;
         utterance.pitch = 1.0;
@@ -115,7 +111,6 @@ export const ResultsHub: React.FC<ResultsHubProps> = ({ onNavigate }) => {
     return `${m}:${s.toString().padStart(2, '0')}`;
   };
 
-  // Generate DEV.to Hacktoberfest Markdown Post
   const generateDevToSummary = () => {
     const job = activeJob;
     const minutes = grassMetrics?.minutes_away || Math.floor((job?.away_duration_seconds || 0) / 60) || 12;
@@ -123,27 +118,25 @@ export const ResultsHub: React.FC<ResultsHubProps> = ({ onNavigate }) => {
     const health = job?.health_score || 94;
 
     return `---
-title: How I touched grass for ${minutes} minutes while AI fixed my codebase 🌳
+title: Autonomous Offline Refactoring with OutOfOffice AI (${minutes} minutes away)
 published: true
 tags: hacktoberfest, ai, showdev, productivity
 ---
 
-# OutOfOffice AI: The Autonomous "Touch Grass" Coding Agent
+# OutOfOffice AI: Autonomous Background Coding Agent
 
-While I took a break from the screen and touched grass for **${minutes} minutes** (${grassMetrics?.badge.tier || 'Park Ranger'} tier 🌱), **OutOfOffice AI** executed an autonomous AST refactoring mission on my local repository.
+While taking a break for **${minutes} minutes**, **OutOfOffice AI** executed an autonomous AST refactoring mission on the local repository.
 
-## 📊 Mission Summary
+## Summary
 - **Target Mode:** ${job?.mode || 'FIX'} Mode
-- **Repository Health Score:** ${health}/100 🛡️
+- **Repository Health Score:** ${health}/100
 - **Findings Resolved:** ${job?.findings?.length || 0} issues
 - **Diffs Verified:** ${job?.diffs?.length || 0} files patched
 - **Isolated Branch:** \`${branch}\`
-- **Inference Engine:** Google Gemma 2 (100% Local Ollama)
+- **Inference Engine:** Google Gemma 2 (Local Ollama)
 - **Partner Integrations:** Sentry Agent Telemetry & ElevenLabs Voice Narration
 
-> "${job?.audio_briefing?.script_text || 'Welcome back! Your tests are green and clean patches have been generated.'}"
-
-Built with ❤️ for **Hacktoberfest 2026**.
+> "${job?.audio_briefing?.script_text || 'Welcome back. Your tests are green and clean patches have been generated.'}"
 `;
   };
 
@@ -158,26 +151,25 @@ Built with ❤️ for **Hacktoberfest 2026**.
   const currentDiff = diffs[selectedDiffIndex];
   const healthScore = activeJob?.health_score || 92;
 
-  // Render unified diff with syntax styling
   const renderUnifiedDiff = (diffText: string) => {
-    if (!diffText) return <div className="text-slate-500 italic p-4">No diff available.</div>;
+    if (!diffText) return <div className="text-slate-500 italic p-3 text-xs">No diff available.</div>;
 
     const lines = diffText.split('\n');
     return (
-      <div className="font-mono text-xs overflow-x-auto leading-relaxed divide-y divide-forest-950/40">
+      <div className="font-mono text-xs overflow-x-auto leading-relaxed divide-y divide-[#182026]">
         {lines.map((line, idx) => {
           let bgClass = 'bg-transparent text-slate-300';
 
           if (line.startsWith('+') && !line.startsWith('+++')) {
-            bgClass = 'bg-emerald-950/40 text-emerald-300 font-semibold border-l-2 border-emerald-400 pl-2';
+            bgClass = 'bg-emerald-950/20 text-emerald-300 font-medium border-l-2 border-emerald-500 pl-2';
           } else if (line.startsWith('-') && !line.startsWith('---')) {
-            bgClass = 'bg-rose-950/40 text-rose-300 border-l-2 border-rose-500 pl-2 line-through opacity-80';
+            bgClass = 'bg-red-950/20 text-red-300 border-l-2 border-red-500 pl-2 opacity-80';
           } else if (line.startsWith('@@')) {
-            bgClass = 'bg-cyan-950/30 text-cyan-400 font-bold py-1 px-2';
+            bgClass = 'bg-sky-950/20 text-sky-400 font-semibold py-0.5 px-2';
           }
 
           return (
-            <div key={idx} className={`py-0.5 px-3 whitespace-pre ${bgClass}`}>
+            <div key={idx} className={`py-0.5 px-2.5 whitespace-pre ${bgClass}`}>
               {line}
             </div>
           );
@@ -187,8 +179,8 @@ Built with ❤️ for **Hacktoberfest 2026**.
   };
 
   return (
-    <div className="space-y-8 animate-fade-in">
-      {/* Hidden Audio Tag for local file streaming */}
+    <div className="space-y-6">
+      {/* Audio Element */}
       {audioStrategy?.strategy === 'file_stream' && audioStrategy.stream_url && (
         <audio
           ref={audioRef}
@@ -199,20 +191,20 @@ Built with ❤️ for **Hacktoberfest 2026**.
         />
       )}
 
-      {/* Top Bar: Results Hub Branding & Return CTA */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-forest-800/40">
+      {/* Top Bar */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#222d35]">
         <div>
-          <div className="flex items-center gap-3">
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight flex items-center gap-3">
-              <Award className="h-7 w-7 text-grass-neon" />
-              <span>Results Hub & Verification</span>
+          <div className="flex items-center gap-2">
+            <h1 className="text-xl font-bold text-white tracking-tight flex items-center gap-2">
+              <Award className="h-5 w-5 text-emerald-400" />
+              <span>Results Hub</span>
             </h1>
-            <span className="badge-grass">
-              {activeJob?.status === 'COMPLETED' ? 'Mission Verified' : 'Mission Completed'}
+            <span className="text-emerald-400 font-mono text-xs font-medium">
+              {activeJob?.status === 'COMPLETED' ? 'Verified' : 'Completed'}
             </span>
           </div>
-          <p className="text-slate-400 text-sm mt-1">
-            Review audio debriefs, health metrics, and verified AST code patches.
+          <p className="text-slate-400 text-xs mt-0.5">
+            Review voice debrief, repository health metrics, and verified AST code patches.
           </p>
         </div>
 
@@ -220,18 +212,18 @@ Built with ❤️ for **Hacktoberfest 2026**.
           <button
             type="button"
             onClick={handleCopyDevTo}
-            className="btn-secondary px-3.5 py-2 text-xs flex items-center gap-1.5"
-            title="Copy formatted DEV.to markdown summary"
+            className="btn-secondary px-3 py-1.5 text-xs flex items-center gap-1.5"
+            title="Copy formatted markdown summary"
           >
             {copiedDevTo ? (
               <>
                 <Check className="h-3.5 w-3.5 text-emerald-400" />
-                <span className="text-emerald-400">DEV.to Copied!</span>
+                <span className="text-emerald-400">Copied</span>
               </>
             ) : (
               <>
-                <Share2 className="h-3.5 w-3.5 text-grass-neon" />
-                <span>Copy DEV.to Post</span>
+                <Share2 className="h-3.5 w-3.5 text-slate-400" />
+                <span>Copy Summary</span>
               </>
             )}
           </button>
@@ -239,61 +231,55 @@ Built with ❤️ for **Hacktoberfest 2026**.
           <button
             type="button"
             onClick={() => onNavigate('dashboard')}
-            className="btn-primary px-3.5 py-2 text-xs flex items-center gap-1.5"
+            className="btn-primary px-3 py-1.5 text-xs flex items-center gap-1.5"
           >
-            <span>New Mission</span>
-            <ArrowRight className="h-3.5 w-3.5" />
+            <span>New Task</span>
+            <ArrowRight className="h-3 w-3" />
           </button>
         </div>
       </div>
 
-      {/* Hero Card 1: ElevenLabs Voice Debrief Player */}
-      <div className="glass-panel p-6 border border-forest-600/40 relative overflow-hidden space-y-4">
-        <div className="absolute top-0 right-0 w-80 h-80 bg-grass-neon/5 rounded-full blur-3xl pointer-events-none"></div>
-
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-forest-900 border border-grass-neon/40 flex items-center justify-center text-grass-neon shadow-lg shadow-grass-neon/10 flex-shrink-0">
-              <Volume2 className="h-6 w-6" />
+      {/* Hero Card 1: Voice Debrief Player */}
+      <div className="flat-card p-4 space-y-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded bg-[#182026] border border-[#222d35] flex items-center justify-center text-emerald-400 flex-shrink-0">
+              <Volume2 className="h-4 w-4" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-base font-bold text-white">Welcome-Back Audio Debrief</h3>
-                <span className="badge-grass text-[10px]">
-                  {activeJob?.audio_briefing?.provider === 'elevenlabs' ? 'ElevenLabs AI Voice' : 'Speech Synthesis'}
+                <h3 className="text-xs font-semibold text-white">Voice Debrief</h3>
+                <span className="text-slate-400 text-[10px] font-mono">
+                  ({activeJob?.audio_briefing?.provider === 'elevenlabs' ? 'ElevenLabs' : 'Speech Synthesis'})
                 </span>
               </div>
-              <p className="text-xs text-slate-400 mt-0.5">
-                Listen to the voice summary of actions performed while you were away touching grass.
+              <p className="text-[11px] text-slate-400">
+                Summary of actions performed during autonomous background execution.
               </p>
             </div>
           </div>
 
-          {/* Audio Controls */}
-          <div className="flex items-center gap-3 self-end sm:self-auto">
-            <button
-              type="button"
-              onClick={handleTogglePlay}
-              className="btn-touch-grass px-5 py-2.5 text-xs font-bold flex items-center gap-2 shadow-md cursor-pointer"
-            >
-              {isPlaying ? (
-                <>
-                  <Pause className="h-4 w-4" />
-                  <span>Pause Debrief</span>
-                </>
-              ) : (
-                <>
-                  <Play className="h-4 w-4" />
-                  <span>Play Voice Debrief</span>
-                </>
-              )}
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={handleTogglePlay}
+            className="btn-touch-grass px-4 py-1.5 text-xs font-semibold flex items-center gap-1.5 cursor-pointer self-end sm:self-auto"
+          >
+            {isPlaying ? (
+              <>
+                <Pause className="h-3.5 w-3.5" />
+                <span>Pause</span>
+              </>
+            ) : (
+              <>
+                <Play className="h-3.5 w-3.5 fill-current" />
+                <span>Play Debrief</span>
+              </>
+            )}
+          </button>
         </div>
 
-        {/* Audio Progress Bar & Time */}
         {audioStrategy?.strategy === 'file_stream' && (
-          <div className="flex items-center gap-3 pt-2 font-mono text-xs text-slate-400">
+          <div className="flex items-center gap-2 pt-1 font-mono text-xs text-slate-400">
             <span>{formatAudioTime(audioCurrentTime)}</span>
             <input
               type="range"
@@ -301,134 +287,112 @@ Built with ❤️ for **Hacktoberfest 2026**.
               max={audioDuration || 100}
               value={audioCurrentTime}
               onChange={handleSeek}
-              className="flex-1 h-1.5 bg-forest-950 rounded-lg appearance-none cursor-pointer accent-grass-neon"
+              className="flex-1 h-1 bg-[#182026] rounded appearance-none cursor-pointer accent-emerald-400"
             />
             <span>{formatAudioTime(audioDuration)}</span>
           </div>
         )}
 
-        {/* Script Transcript Box */}
-        <div className="p-3.5 rounded-xl bg-forest-950/70 border border-forest-800/80 text-xs text-slate-300 font-serif italic leading-relaxed">
+        <div className="p-3 rounded bg-[#0d1216] border border-[#1e262c] text-xs text-slate-300 italic leading-relaxed font-sans">
           "{activeJob?.audio_briefing?.script_text ||
-            'Welcome back! While you were outside touching grass, OutOfOffice AI analyzed your repository, verified clean tests, and generated isolated Git branch patches.'}"
+            'Welcome back. While you were away, OutOfOffice AI analyzed your repository, verified clean tests, and generated isolated Git branch patches.'}"
         </div>
       </div>
 
-      {/* Metrics Row: Health Score, Test Pass Badge, Grass Time */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Card 1: Radial Health Score */}
-        <div className="glass-card p-6 border border-forest-800/50 flex flex-col justify-between items-center text-center">
-          <div className="w-full flex items-center justify-between text-xs text-slate-400 font-mono mb-2">
+      {/* Metrics Row */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Card 1: Health Score */}
+        <div className="flat-card p-4 flex flex-col justify-between items-center text-center">
+          <div className="w-full flex items-center justify-between text-xs text-slate-400 font-mono mb-1">
             <span>Health Score</span>
-            <ShieldCheck className="h-4 w-4 text-grass-neon" />
+            <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
           </div>
 
-          {/* Circular Progress Gauge */}
-          <div className="relative w-32 h-32 my-2 flex items-center justify-center">
-            <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
-              <path
-                className="text-forest-950"
-                strokeWidth="3.5"
-                stroke="currentColor"
-                fill="none"
-                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-              />
-              <path
-                className="text-grass-neon transition-all duration-1000 ease-out"
-                strokeDasharray={`${healthScore}, 100`}
-                strokeWidth="3.5"
-                strokeLinecap="round"
-                stroke="currentColor"
-                fill="none"
-                d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-              />
-            </svg>
-            <div className="absolute flex flex-col items-center">
-              <span className="text-3xl font-black font-mono text-white">{healthScore}</span>
-              <span className="text-[10px] text-slate-400 font-mono">/ 100</span>
-            </div>
+          <div className="my-2">
+            <div className="text-3xl font-bold font-mono text-white">{healthScore}</div>
+            <div className="text-[11px] text-slate-500 font-mono">out of 100</div>
           </div>
 
-          <p className="text-xs text-slate-400 mt-2">
-            {healthScore >= 90 ? '🛡️ Exceptional Quality' : '⚡ Good Quality'} • Ready for Merge
+          <p className="text-[11px] text-slate-400 mt-1">
+            {healthScore >= 90 ? 'High Quality' : 'Standard Quality'} • Ready for Review
           </p>
         </div>
 
         {/* Card 2: Test Verification Badge */}
-        <div className="glass-card p-6 border border-forest-800/50 flex flex-col justify-between">
+        <div className="flat-card p-4 flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between text-xs text-slate-400 font-mono mb-2">
+            <div className="flex items-center justify-between text-xs text-slate-400 font-mono mb-1">
               <span>Test Suite Verification</span>
-              <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+              <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
             </div>
-            <h4 className="text-base font-bold text-white mb-1">Sandbox Validation</h4>
-            <p className="text-xs text-slate-400 mb-4">
-              All fixes were independently verified by running tests on the isolated branch.
+            <h4 className="text-xs font-semibold text-white mb-0.5">Isolated Sandbox</h4>
+            <p className="text-[11px] text-slate-400 mb-3">
+              Fixes verified by executing test suite on isolated branch.
             </p>
           </div>
 
-          <div className="p-3 rounded-xl bg-forest-950/80 border border-emerald-500/30 font-mono text-xs space-y-1.5">
-            <div className="flex items-center justify-between text-emerald-400 font-bold">
-              <span>✓ Test Suite Passed</span>
-              <span className="badge-grass text-[10px]">100% Green</span>
+          <div className="p-2.5 rounded bg-[#0d1216] border border-[#1e262c] font-mono text-xs space-y-1">
+            <div className="flex items-center justify-between text-emerald-400 font-medium">
+              <span>Test Suite Passed</span>
+              <span className="text-[10px] text-emerald-400 font-mono">Passed</span>
             </div>
-            <div className="text-[11px] text-slate-400">
+            <div className="text-[10px] text-slate-400 truncate">
               Branch: <code className="text-slate-200">{activeJob?.agent_branch || 'agent/outofoffice-*'}</code>
             </div>
           </div>
         </div>
 
-        {/* Card 3: Grass Touched Summary */}
-        <div className="glass-card p-6 border border-forest-800/50 flex flex-col justify-between">
+        {/* Card 3: Away Time Logged */}
+        <div className="flat-card p-4 flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between text-xs text-slate-400 font-mono mb-2">
-              <span>Offline Freedom</span>
-              <Trees className="h-4 w-4 text-grass-neon" />
+            <div className="flex items-center justify-between text-xs text-slate-400 font-mono mb-1">
+              <span>Away Duration</span>
+              <Clock className="h-3.5 w-3.5 text-slate-400" />
             </div>
-            <h4 className="text-base font-bold text-white mb-1">Away Time Logged</h4>
-            <p className="text-xs text-slate-400 mb-4">
-              Total screen time saved during autonomous task execution.
+            <h4 className="text-xs font-semibold text-white mb-0.5">Time Logged</h4>
+            <p className="text-[11px] text-slate-400 mb-3">
+              Total duration recorded during autonomous execution.
             </p>
           </div>
 
-          <div className="p-3 rounded-xl bg-forest-950/80 border border-forest-800/60 font-mono text-xs space-y-1">
+          <div className="p-2.5 rounded bg-[#0d1216] border border-[#1e262c] font-mono text-xs space-y-1">
             <div className="flex items-center justify-between">
-              <span className="text-slate-400">Grass Duration:</span>
-              <span className="text-grass-neon font-bold text-sm">
+              <span className="text-slate-400">Duration:</span>
+              <span className="text-white font-semibold text-xs">
                 {grassMetrics?.formatted_time || '00:18:42'}
               </span>
             </div>
-            <div className="flex items-center justify-between text-[11px]">
-              <span className="text-slate-500">Tier Badge:</span>
-              <span className="text-emerald-400 font-semibold">
-                {grassMetrics?.badge.tier || '🌳 Park Ranger'}
+            <div className="flex items-center justify-between text-[10px]">
+              <span className="text-slate-500">Tier:</span>
+              <span className="text-emerald-400 font-medium">
+                {grassMetrics?.badge.tier || 'Park Ranger'}
               </span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Code Diffs Viewer & Branch Action Bar */}
-      <div className="glass-card p-6 border border-forest-700/50 space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-forest-800/60">
+      {/* Code Diffs Viewer */}
+      <div className="flat-card p-4 space-y-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-2.5 border-b border-[#222d35]">
           <div className="flex items-center gap-2">
-            <FileCode className="h-5 w-5 text-grass-neon" />
-            <h3 className="text-base font-bold text-white">
+            <FileCode className="h-4 w-4 text-emerald-400" />
+            <h3 className="text-xs font-semibold text-white">
               Unified Code Diffs ({diffs.length} files modified)
             </h3>
           </div>
 
-          {/* Branch Action Buttons */}
+          {/* Branch Actions */}
           <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={() => {
-                setMergeStatus(`Run 'git merge ${activeJob?.agent_branch || 'agent/outofoffice-*'}' to integrate.`);
+                setMergeStatus(`Run 'git merge ${activeJob?.agent_branch || 'agent/outofoffice-*'}' to integrate changes.`);
               }}
-              className="px-3 py-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm cursor-pointer"
+              className="px-2.5 py-1 rounded bg-[#059669] hover:bg-[#047857] text-white text-xs font-medium flex items-center gap-1 cursor-pointer"
             >
-              <GitMerge className="h-3.5 w-3.5" />
-              <span>Merge Branch</span>
+              <GitMerge className="h-3 w-3" />
+              <span>Merge</span>
             </button>
 
             <button
@@ -436,81 +400,80 @@ Built with ❤️ for **Hacktoberfest 2026**.
               onClick={() => {
                 setMergeStatus(`Branch '${activeJob?.agent_branch}' can be discarded with 'git branch -D'.`);
               }}
-              className="px-3 py-1.5 rounded-lg bg-dark-input hover:bg-forest-900 border border-forest-800 text-slate-300 text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
+              className="px-2.5 py-1 rounded bg-[#182026] hover:bg-[#222d35] border border-[#222d35] text-slate-300 text-xs font-medium flex items-center gap-1 cursor-pointer"
             >
-              <Trash2 className="h-3.5 w-3.5 text-rose-400" />
+              <Trash2 className="h-3 w-3 text-red-400" />
               <span>Discard</span>
             </button>
           </div>
         </div>
 
         {mergeStatus && (
-          <div className="p-3 rounded-xl bg-forest-950/90 border border-grass-neon/40 text-xs text-grass-neon font-mono animate-fade-in flex items-center justify-between">
+          <div className="p-2.5 rounded bg-[#0d1216] border border-[#222d35] text-xs text-slate-300 font-mono flex items-center justify-between">
             <span>{mergeStatus}</span>
             <button
               onClick={() => setMergeStatus(null)}
-              className="text-slate-400 hover:text-white"
+              className="text-slate-400 hover:text-white px-1"
             >
-              ✕
+              Dismiss
             </button>
           </div>
         )}
 
-        {/* File Tabs for Multi-File Diffs */}
+        {/* File Tabs */}
         {diffs.length > 0 ? (
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 overflow-x-auto pb-1">
+          <div className="space-y-3">
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5">
               {diffs.map((d, index) => (
                 <button
                   key={d.id}
                   type="button"
                   onClick={() => setSelectedDiffIndex(index)}
-                  className={`px-3 py-1.5 rounded-lg font-mono text-xs whitespace-nowrap transition-all flex items-center gap-1.5 ${
-                    selectedDiffIndex === index
-                      ? 'bg-forest-800 text-white ring-1 ring-grass-neon/40'
-                      : 'bg-dark-input/60 text-slate-400 hover:text-white'
-                  }`}
+                  className={`px-2.5 py-1 rounded font-mono text-xs whitespace-nowrap transition-colors flex items-center gap-1.5 ${selectedDiffIndex === index
+                    ? 'bg-[#182026] text-white border border-[#2e3e4a]'
+                    : 'bg-[#0d1216] text-slate-400 hover:text-white border border-transparent'
+                    }`}
                 >
-                  <FileCode className="h-3.5 w-3.5 text-grass-neon" />
+                  <FileCode className="h-3 w-3 text-emerald-400" />
                   <span>{d.file_path}</span>
-                  <span className="badge-grass text-[9px]">
-                    {d.status}
+                  <span className="text-slate-500 text-[10px]">
+                    ({d.status})
                   </span>
                 </button>
               ))}
             </div>
 
             {/* Diff Viewer Frame */}
-            <div className="rounded-xl bg-dark-bg/95 border border-forest-800/80 overflow-hidden shadow-inner">
-              <div className="p-2.5 bg-forest-950/90 border-b border-forest-800/60 font-mono text-xs text-slate-300 flex items-center justify-between">
-                <span className="font-bold">{currentDiff?.file_path || 'Patch'}</span>
-                <span className="text-[10px] text-slate-500">Unified Git Diff</span>
+            <div className="rounded border border-[#222d35] bg-[#090d10] overflow-hidden">
+              <div className="p-2 bg-[#0d1216] border-b border-[#1e262c] font-mono text-xs text-slate-400 flex items-center justify-between">
+                <span className="font-medium text-slate-200">{currentDiff?.file_path || 'Patch'}</span>
+                <span className="text-[10px]">Unified Diff</span>
               </div>
 
               {currentDiff ? (
                 renderUnifiedDiff(currentDiff.diff_unified)
               ) : (
-                <div className="p-8 text-center text-slate-500 font-mono text-xs">
+                <div className="p-6 text-center text-slate-500 font-mono text-xs">
                   Select a diff file above to inspect changes.
                 </div>
               )}
             </div>
           </div>
         ) : (
-          <div className="p-8 text-center text-slate-500 font-mono text-xs">
-            No code diffs were generated (Audit Mode only or no changes required).
+          <div className="p-6 text-center text-slate-500 font-mono text-xs">
+            No code diffs were generated (Audit Mode only or zero changes required).
           </div>
         )}
       </div>
 
       {/* Executive Report Markdown */}
       {activeJob?.final_report_markdown && (
-        <div className="glass-card p-6 border border-forest-800/50 space-y-3">
-          <h3 className="text-base font-bold text-white flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-grass-neon" />
+        <div className="flat-card p-4 space-y-2">
+          <h3 className="text-xs font-semibold text-white flex items-center gap-1.5">
+            <Sparkles className="h-3.5 w-3.5 text-emerald-400" />
             Executive Report
           </h3>
-          <div className="p-4 rounded-xl bg-forest-950/60 border border-forest-900 text-xs text-slate-300 leading-relaxed whitespace-pre-wrap font-mono">
+          <div className="p-3 rounded bg-[#0d1216] border border-[#1e262c] text-xs text-slate-300 leading-relaxed whitespace-pre-wrap font-mono">
             {activeJob.final_report_markdown}
           </div>
         </div>

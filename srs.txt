@@ -107,7 +107,7 @@ The challenge asks participants to build open-weight/open-source AI projects tha
 
 | Layer | Technology | Purpose |
 | :--- | :--- | :--- |
-| **Frontend UI** | React 18, Vite, TypeScript, TailwindCSS / Lucide | Intuitive 4-screen workflow, live grass timer, diff viewer, trace visualizer. |
+| **Frontend UI** | React 18, Vite, TypeScript, TailwindCSS / Lucide | Intuitive 3-screen workflow, real-time telemetry visualizer, unified diff viewer, audio player. |
 | **Backend API** | Python 3.11+, FastAPI, Uvicorn, WebSockets | Async task scheduling, repo management, real-time event streaming. |
 | **Agent Orchestration** | LangGraph & LangChain | Cyclic graph-based planning, investigation, and verification loops. |
 | **Local LLM Inference** | Ollama (Gemma 2 / CodeGemma / Qwen 2.5 Coder) | 100% offline, privacy-first local code comprehension and generation. |
@@ -149,7 +149,7 @@ The challenge asks participants to build open-weight/open-source AI projects tha
 ### 5.4 Background Resilience ("Touch Grass" Execution)
 * **FR-08 (Headless Execution):** Job execution runs decoupled in background worker threads/Temporal workflows.
 * **FR-09 (State Re-hydration):** Closing the browser or shutting down the UI does not terminate running jobs. Reopening the web UI queries SQLite to re-hydrate the exact step and progress state.
-* **FR-10 (Away-Time Tracking):** Records timestamps from job start $\rightarrow$ completion, computing total "Grass Touched" minutes.
+* **FR-10 (Away-Time Tracking):** Records timestamps from job start $\rightarrow$ completion, computing total offline minutes.
 
 ### 5.5 Completion Artifacts & Audio Briefing
 * **FR-11 (Health & Findings Matrix):** Categorizes findings by severity (`HIGH`, `MEDIUM`, `LOW`) and status (`Detected Fact` vs. `AI Recommendation`).
@@ -174,23 +174,19 @@ The challenge asks participants to build open-weight/open-source AI projects tha
 * Repository picker & active Git branch display.
 * Task input prompt (with quick templates: *Dead Code Cleanup*, *Test Suite Fixes*, *Dependency Audit*).
 * Mode Switcher: `[ Audit Mode (Safe) ]` | `[ Fix Mode (Branch Isolated) ]`.
-* Hero Action: **`[ 🌳 GO TOUCH GRASS ]`** button.
+* Hero Action: **`[ Launch Task & View Telemetry ]`** button.
 
-### Screen 2: "Touch Grass" Away Screen
-* Calming, minimalist aesthetic with live outdoor timer (*"Away for 00:24:18"*).
-* Dynamic status line (*"Agent is analyzing AST references in background..."*).
-* Friendly reminder: *"You can safely close this window. Your agent is working locally."*
+### Screen 2: Agent Trace & Telemetry Visualizer
+* Live step-by-step LangGraph node execution steps.
+* Sentry trace waterfall showing tool latencies, tokens processed, and stdout/stderr terminal output logs.
+* Filter query and live status indicators.
 
-### Screen 3: Agent Trace & Telemetry
-* Live step-by-step LangGraph node execution graph.
-* Sentry trace waterfall showing tool latencies, tokens processed, and terminal outputs.
-
-### Screen 4: Results & Welcome-Back Hub
+### Screen 3: Results Hub & Code Patches
 * **Welcome-Back Audio Player:** ElevenLabs synthesized voice debrief.
 * **Repository Health Score:** (e.g., `88/100 (+6)`).
-* **Test Verification Badge:** `47 / 47 Passed (2 Fixed)`.
+* **Test Verification:** Test suite validation on isolated branch.
 * **Git Branch & Unified Diff Viewer:** Clean review of modifications on `agent/outofoffice-*`.
-* **Action Buttons:** `[ Merge to Current Branch ]` | `[ Discard Branch ]` | `[ Export DEV.to Writeup ]`.
+* **Action Buttons:** `[ Merge to Current Branch ]` | `[ Discard Branch ]` | `[ Copy DEV.to Summary ]`.
 
 ---
 

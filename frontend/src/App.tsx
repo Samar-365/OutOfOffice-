@@ -1,25 +1,25 @@
+/**
+ * OutOfOffice AI — Root Application Component
+ * Flat, minimalist, professional developer UI.
+ */
+
 import React, { useState } from 'react';
 import { Navbar } from './components/Navbar';
 import { Dashboard } from './views/Dashboard';
-import { AwayScreen } from './views/AwayScreen';
 import { TraceView } from './views/TraceView';
 import { ResultsHub } from './views/ResultsHub';
-import { Trees } from 'lucide-react';
+import { Terminal } from 'lucide-react';
 
 export const App: React.FC = () => {
-  const [activeScreen, setActiveScreen] = useState<'dashboard' | 'away' | 'trace' | 'results'>('dashboard');
+  const [activeScreen, setActiveScreen] = useState<'dashboard' | 'trace' | 'results'>('dashboard');
 
   return (
-    <div className="min-h-screen flex flex-col bg-dark-bg text-slate-100">
+    <div className="min-h-screen flex flex-col bg-[#0b0f12] text-slate-100 antialiased">
       <Navbar activeScreen={activeScreen} onNavigate={setActiveScreen} />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {activeScreen === 'dashboard' && (
           <Dashboard onNavigate={setActiveScreen} />
-        )}
-
-        {activeScreen === 'away' && (
-          <AwayScreen onNavigate={setActiveScreen} />
         )}
 
         {activeScreen === 'trace' && (
@@ -32,11 +32,11 @@ export const App: React.FC = () => {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-forest-900/60 py-6 bg-dark-bg/60">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 font-mono">
+      <footer className="border-t border-[#222d35] py-4 bg-[#0b0f12]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 font-mono">
           <div className="flex items-center gap-2">
-            <Trees className="h-4 w-4 text-grass-neon" />
-            <span>OutOfOffice AI • Built for Hacktoberfest 2026</span>
+            <Terminal className="h-3.5 w-3.5 text-emerald-400" />
+            <span>OutOfOffice AI • Local Autonomous Coding Agent</span>
           </div>
           <div>
             Powered by Google Gemma 2 • Sentry Tracing • ElevenLabs Voice
@@ -48,4 +48,3 @@ export const App: React.FC = () => {
 };
 
 export default App;
-

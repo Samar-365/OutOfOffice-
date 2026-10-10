@@ -1,14 +1,12 @@
 /**
  * Screen 1: Mission Control Dashboard
- * Provides repository path validation, prompt presets, execution mode toggle,
- * and the hero "[ GO TOUCH GRASS ]" execution trigger.
+ * Flat, minimalist, professional developer UI with zero emojis.
  */
 
 import React, { useState, useEffect } from 'react';
 import { useJob } from '../context/JobContext';
 import { JobMode } from '../types';
 import {
-  Trees,
   FolderGit2,
   CheckCircle2,
   AlertCircle,
@@ -19,14 +17,14 @@ import {
   FileCode,
   Clock,
   ArrowRight,
-  Cpu,
   RefreshCw,
   Search,
   Zap,
+  Play,
 } from 'lucide-react';
 
 interface DashboardProps {
-  onNavigate: (screen: 'dashboard' | 'away' | 'trace' | 'results') => void;
+  onNavigate: (screen: 'dashboard' | 'trace' | 'results') => void;
 }
 
 interface PresetPrompt {
@@ -44,7 +42,7 @@ const PRESETS: PresetPrompt[] = [
     title: 'Find Dead Code & Prune',
     subtitle: 'Unused imports, unreachable functions & dead exports',
     prompt: 'Scan the repository for unused imports, dead functions, unreferenced exports, and unused local variables. Verify with AST analysis and safely report or remove them.',
-    icon: <Sparkles className="h-4 w-4 text-emerald-400" />,
+    icon: <Sparkles className="h-3.5 w-3.5 text-emerald-400" />,
     recommendedMode: 'AUDIT',
   },
   {
@@ -52,7 +50,7 @@ const PRESETS: PresetPrompt[] = [
     title: 'Fix Failing Tests',
     subtitle: 'Run test suite, find AST bugs & generate green fixes',
     prompt: 'Execute the project test suite, locate failing assertions or unhandled exceptions, investigate root causes in the codebase AST, and synthesize minimal green patches.',
-    icon: <Wrench className="h-4 w-4 text-amber-400" />,
+    icon: <Wrench className="h-3.5 w-3.5 text-amber-400" />,
     recommendedMode: 'FIX',
   },
   {
@@ -60,7 +58,7 @@ const PRESETS: PresetPrompt[] = [
     title: 'Full Repository Audit',
     subtitle: 'Security checks, linter diagnostics & test coverage',
     prompt: 'Run comprehensive security, lint, test, and dead code audits across all project modules, generating an executive health score and action plan.',
-    icon: <ShieldCheck className="h-4 w-4 text-sky-400" />,
+    icon: <ShieldCheck className="h-3.5 w-3.5 text-sky-400" />,
     recommendedMode: 'AUDIT',
   },
   {
@@ -68,7 +66,7 @@ const PRESETS: PresetPrompt[] = [
     title: 'Modernize & Optimize',
     subtitle: 'Refactor legacy code & apply modern idioms',
     prompt: 'Analyze legacy code patterns, modernize deprecated syntax, optimize slow loops or synchronous bottlenecks, and ensure standard coding practices.',
-    icon: <Zap className="h-4 w-4 text-purple-400" />,
+    icon: <Zap className="h-3.5 w-3.5 text-purple-400" />,
     recommendedMode: 'FIX',
   },
 ];
@@ -79,7 +77,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
     launchJob,
     isValidatingRepo,
     repoMetadata,
-    modelsStatus,
     recentJobs,
     isLaunching,
     error: storeError,
@@ -94,7 +91,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
   const [validationSuccess, setValidationSuccess] = useState<boolean | null>(null);
   const [localError, setLocalError] = useState<string | null>(null);
 
-  // Set default repo path from window location or current workspace default if available
   useEffect(() => {
     if (!repoPath) {
       const defaultPath = '.';
@@ -132,8 +128,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
 
     const job = await launchJob(repoPath.trim(), taskPrompt.trim(), selectedMode);
     if (job) {
-      // Transition immediately to the Away screen so user can step away from keyboard
-      onNavigate('away');
+      onNavigate('trace');
     }
   };
 
@@ -143,44 +138,30 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
   };
 
   return (
-    <div className="space-y-8 animate-fade-in">
-      {/* Top Bar: Mission Control Status */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-forest-800/40">
+    <div className="space-y-6">
+      {/* Top Bar: Mission Control Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#222d35]">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight flex items-center gap-3">
-            <Trees className="h-7 w-7 text-grass-neon animate-pulse" />
+          <h1 className="text-xl font-bold text-white tracking-tight flex items-center gap-2">
             <span>Mission Control</span>
           </h1>
-          <p className="text-slate-400 text-sm mt-1">
-            Dispatch autonomous agent tasks and step away from your keyboard.
+          <p className="text-slate-400 text-xs mt-0.5">
+            Dispatch autonomous tasks and step away from your workstation.
           </p>
-        </div>
-
-        {/* Ollama & Model Status Pill */}
-        <div className="flex items-center gap-3 self-start sm:self-auto">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-forest-950/80 border border-forest-800/60 font-mono text-xs shadow-inner">
-            <Cpu className="h-3.5 w-3.5 text-grass-neon" />
-            <span className="text-slate-300">Model:</span>
-            <span className="text-grass-neon font-bold">
-              {modelsStatus?.default_model || 'gemma2:9b'}
-            </span>
-            <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-          </div>
         </div>
       </div>
 
-      {/* Main Grid: Left Setup Pane, Right Config & CTA Pane */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Left Column (7 cols): Repo Selection & Task Presets */}
-        <div className="lg:col-span-7 space-y-6">
+      {/* Main Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Left Column (7 cols) */}
+        <div className="lg:col-span-7 space-y-4">
           {/* Section 1: Repository Path Input */}
-          <div className="glass-card p-6 border border-forest-700/40 space-y-4">
+          <div className="flat-card p-5 space-y-3">
             <div className="flex items-center justify-between">
-              <label htmlFor="repo-path-input" className="text-sm font-bold text-white flex items-center gap-2">
-                <FolderGit2 className="h-4 w-4 text-grass-neon" />
-                Target Repository Path
+              <label htmlFor="repo-path-input" className="text-xs font-semibold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+                <FolderGit2 className="h-3.5 w-3.5 text-emerald-400" />
+                Target Repository
               </label>
-              <span className="text-xs text-slate-400 font-mono">Local Filesystem</span>
             </div>
 
             <div className="flex items-center gap-2">
@@ -195,12 +176,12 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                   }}
                   onBlur={() => handleValidation(repoPath)}
                   onKeyDown={(e) => e.key === 'Enter' && handleValidation(repoPath)}
-                  placeholder="e.g. . or /path/to/project or C:\Users\..."
-                  className="w-full bg-dark-input/90 border border-forest-800/80 focus:border-grass-neon focus:ring-1 focus:ring-grass-neon rounded-xl px-4 py-2.5 text-sm text-slate-100 font-mono placeholder:text-slate-500 transition-all"
+                  placeholder="e.g. . or /path/to/project"
+                  className="w-full flat-input px-3 py-2 text-xs font-mono"
                 />
                 {isValidatingRepo && (
-                  <div className="absolute right-3 top-3">
-                    <RefreshCw className="h-4 w-4 text-grass-neon animate-spin" />
+                  <div className="absolute right-3 top-2.5">
+                    <RefreshCw className="h-3.5 w-3.5 text-emerald-400 animate-spin" />
                   </div>
                 )}
               </div>
@@ -209,43 +190,46 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                 type="button"
                 onClick={() => handleValidation(repoPath)}
                 disabled={isValidatingRepo}
-                className="btn-secondary px-4 py-2.5 text-xs font-semibold whitespace-nowrap"
+                className="btn-secondary px-3 py-2 text-xs whitespace-nowrap"
               >
-                <Search className="h-3.5 w-3.5 text-grass-neon" />
+                <Search className="h-3 w-3 text-slate-400" />
                 Validate
               </button>
             </div>
 
-            {/* Validation Feedback & Repo Metadata Card */}
+            {/* Validation Feedback */}
             {validationSuccess === true && repoMetadata && (
-              <div className="p-3.5 rounded-xl bg-forest-950/70 border border-emerald-500/30 text-xs space-y-2 animate-fade-in">
+              <div className="p-3 rounded bg-[#0d1216] border border-[#222d35] text-xs space-y-1.5">
                 <div className="flex items-center justify-between font-mono">
-                  <div className="flex items-center gap-2 text-emerald-400 font-bold">
-                    <CheckCircle2 className="h-4 w-4" />
+                  <div className="flex items-center gap-1.5 text-emerald-400 font-medium">
+                    <CheckCircle2 className="h-3.5 w-3.5" />
                     <span>Valid Repository: {repoMetadata.repo_path.split(/[\\/]/).pop() || repoMetadata.repo_path}</span>
                   </div>
-                  <div className="flex items-center gap-1.5 text-slate-300">
-                    <GitBranch className="h-3.5 w-3.5 text-grass-neon" />
+                  <div className="flex items-center gap-1 text-slate-400">
+                    <GitBranch className="h-3 w-3 text-slate-400" />
                     <span>{repoMetadata.current_branch || 'main'}</span>
                   </div>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-3 text-slate-400 pt-1 border-t border-forest-800/40">
+                <div className="flex flex-wrap items-center gap-3 text-slate-400 pt-1 border-t border-[#182026] text-[11px]">
                   <div className="flex items-center gap-1">
-                    <FileCode className="h-3 w-3 text-slate-400" />
+                    <FileCode className="h-3 w-3 text-slate-500" />
                     <span>{repoMetadata.total_files} files</span>
                   </div>
                   {repoMetadata.languages && repoMetadata.languages.length > 0 && (
-                    <div className="flex items-center gap-1">
-                      <span>Languages:</span>
-                      <span className="text-slate-200 font-semibold">
+                    <div>
+                      <span>Languages: </span>
+                      <span className="text-slate-300 font-medium">
                         {repoMetadata.languages.join(', ')}
                       </span>
                     </div>
                   )}
                   {repoMetadata.test_framework && (
-                    <div className="badge-grass text-[10px]">
-                      Test Suite: {repoMetadata.test_framework}
+                    <div>
+                      <span>Test Suite: </span>
+                      <span className="text-slate-300 font-medium">
+                        {repoMetadata.test_framework}
+                      </span>
                     </div>
                   )}
                 </div>
@@ -253,39 +237,37 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
             )}
 
             {validationSuccess === false && (
-              <div className="p-3 rounded-xl bg-red-950/40 border border-red-500/30 text-xs text-red-300 flex items-center gap-2">
-                <AlertCircle className="h-4 w-4 text-red-400 flex-shrink-0" />
+              <div className="p-2.5 rounded bg-red-950/20 border border-red-500/20 text-xs text-red-300 flex items-center gap-2">
+                <AlertCircle className="h-3.5 w-3.5 text-red-400 flex-shrink-0" />
                 <span>{storeError || 'Directory does not exist or is not a valid git repository.'}</span>
               </div>
             )}
           </div>
 
           {/* Section 2: Task Prompt Input & Presets */}
-          <div className="glass-card p-6 border border-forest-700/40 space-y-4">
+          <div className="flat-card p-5 space-y-3">
             <div className="flex items-center justify-between">
-              <label htmlFor="task-prompt-textarea" className="text-sm font-bold text-white flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-grass-neon" />
-                Task Instruction
+              <label htmlFor="task-prompt-textarea" className="text-xs font-semibold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+                <Sparkles className="h-3.5 w-3.5 text-emerald-400" />
+                Task Directive
               </label>
-              <span className="text-xs text-slate-400 font-mono">Autonomous Directive</span>
             </div>
 
             {/* Presets Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {PRESETS.map((preset) => (
                 <button
                   key={preset.id}
                   type="button"
                   onClick={() => handleSelectPreset(preset)}
-                  className={`p-3 rounded-xl border text-left transition-all duration-200 cursor-pointer flex flex-col justify-between ${
-                    activePresetId === preset.id
-                      ? 'bg-forest-800/80 border-grass-neon/60 shadow-lg shadow-grass-neon/5 ring-1 ring-grass-neon/30'
-                      : 'bg-dark-card/60 border-forest-800/60 hover:border-forest-700 hover:bg-forest-900/40'
-                  }`}
+                  className={`p-3 rounded border text-left transition-colors flex flex-col justify-between ${activePresetId === preset.id
+                    ? 'bg-[#182026] border-emerald-500/50'
+                    : 'bg-[#0d1216] border-[#222d35] hover:border-[#33434f]'
+                    }`}
                 >
-                  <div className="flex items-center gap-2 mb-1.5">
+                  <div className="flex items-center gap-1.5 mb-1">
                     {preset.icon}
-                    <span className="text-xs font-bold text-white">{preset.title}</span>
+                    <span className="text-xs font-semibold text-white">{preset.title}</span>
                   </div>
                   <p className="text-[11px] text-slate-400 line-clamp-2 leading-relaxed">
                     {preset.subtitle}
@@ -295,96 +277,89 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
             </div>
 
             {/* Custom Task Textarea */}
-            <div className="relative">
-              <textarea
-                id="task-prompt-textarea"
-                rows={4}
-                value={taskPrompt}
-                onChange={(e) => {
-                  setTaskPrompt(e.target.value);
-                  setActivePresetId('custom');
-                }}
-                placeholder="Describe your coding task or AST investigation in detail..."
-                className="w-full bg-dark-input/90 border border-forest-800/80 focus:border-grass-neon focus:ring-1 focus:ring-grass-neon rounded-xl p-3.5 text-sm text-slate-100 placeholder:text-slate-500 font-sans transition-all resize-none"
-              />
-            </div>
+            <textarea
+              id="task-prompt-textarea"
+              rows={3}
+              value={taskPrompt}
+              onChange={(e) => {
+                setTaskPrompt(e.target.value);
+                setActivePresetId('custom');
+              }}
+              placeholder="Describe your coding task or AST investigation in detail..."
+              className="w-full flat-input p-3 text-xs leading-relaxed font-sans resize-none"
+            />
           </div>
         </div>
 
-        {/* Right Column (5 cols): Mode Switcher, CTA, Recent Jobs */}
-        <div className="lg:col-span-5 space-y-6">
+        {/* Right Column (5 cols) */}
+        <div className="lg:col-span-5 space-y-4">
           {/* Section 3: Mode Switcher */}
-          <div className="glass-card p-6 border border-forest-700/40 space-y-4">
+          <div className="flat-card p-5 space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-bold text-white flex items-center gap-2">
-                <ShieldCheck className="h-4 w-4 text-grass-neon" />
+              <span className="text-xs font-semibold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+                <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" />
                 Execution Mode
               </span>
-              <span className="badge-grass">Deterministic</span>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
                 onClick={() => setSelectedMode('AUDIT')}
-                className={`p-3.5 rounded-xl border flex flex-col items-center justify-center gap-2 text-center transition-all cursor-pointer ${
-                  selectedMode === 'AUDIT'
-                    ? 'bg-forest-800/90 border-grass-neon text-white shadow-md ring-1 ring-grass-neon/30'
-                    : 'bg-dark-card/50 border-forest-800/60 text-slate-400 hover:text-slate-200 hover:border-forest-700'
-                }`}
+                className={`p-3 rounded border flex flex-col items-center justify-center gap-1 text-center transition-colors ${selectedMode === 'AUDIT'
+                  ? 'bg-[#182026] border-emerald-500/60 text-white'
+                  : 'bg-[#0d1216] border-[#222d35] text-slate-400 hover:text-slate-200'
+                  }`}
               >
-                <ShieldCheck className={`h-5 w-5 ${selectedMode === 'AUDIT' ? 'text-grass-neon' : 'text-slate-400'}`} />
+                <ShieldCheck className={`h-4 w-4 ${selectedMode === 'AUDIT' ? 'text-emerald-400' : 'text-slate-400'}`} />
                 <div>
-                  <div className="text-xs font-bold">Audit Mode</div>
-                  <div className="text-[10px] text-slate-400 mt-0.5">Read-Only Scan</div>
+                  <div className="text-xs font-medium">Audit Mode</div>
+                  <div className="text-[10px] text-slate-400">Read-Only Scan</div>
                 </div>
               </button>
 
               <button
                 type="button"
                 onClick={() => setSelectedMode('FIX')}
-                className={`p-3.5 rounded-xl border flex flex-col items-center justify-center gap-2 text-center transition-all cursor-pointer ${
-                  selectedMode === 'FIX'
-                    ? 'bg-amber-950/40 border-amber-500/80 text-amber-200 shadow-md ring-1 ring-amber-500/30'
-                    : 'bg-dark-card/50 border-forest-800/60 text-slate-400 hover:text-slate-200 hover:border-forest-700'
-                }`}
+                className={`p-3 rounded border flex flex-col items-center justify-center gap-1 text-center transition-colors ${selectedMode === 'FIX'
+                  ? 'bg-[#182026] border-amber-500/60 text-amber-200'
+                  : 'bg-[#0d1216] border-[#222d35] text-slate-400 hover:text-slate-200'
+                  }`}
               >
-                <Wrench className={`h-5 w-5 ${selectedMode === 'FIX' ? 'text-amber-400' : 'text-slate-400'}`} />
+                <Wrench className={`h-4 w-4 ${selectedMode === 'FIX' ? 'text-amber-400' : 'text-slate-400'}`} />
                 <div>
-                  <div className="text-xs font-bold">Fix Mode</div>
-                  <div className="text-[10px] text-slate-400 mt-0.5">Isolated Branch</div>
+                  <div className="text-xs font-medium">Fix Mode</div>
+                  <div className="text-[10px] text-slate-400">Isolated Branch</div>
                 </div>
               </button>
             </div>
 
-            <p className="text-[11px] text-slate-400 leading-relaxed bg-forest-950/50 p-2.5 rounded-lg border border-forest-900/60">
+            <p className="text-[11px] text-slate-400 leading-relaxed bg-[#0d1216] p-2.5 rounded border border-[#1e262c]">
               {selectedMode === 'AUDIT' ? (
                 <span>
-                  🛡️ <strong>Audit Mode:</strong> LangGraph searches AST, audits dependencies, runs linters, and outputs diagnostic findings with zero repo modifications.
+                  <strong>Audit Mode:</strong> Analyzes AST, scans dependencies, and runs diagnostics with zero file modifications.
                 </span>
               ) : (
                 <span>
-                  ⚡ <strong>Fix Mode:</strong> LangGraph creates an isolated <code className="text-amber-300 font-mono">agent/outofoffice-*</code> Git branch, writes verified diffs, runs test suites, and synthesizes an audio debrief.
+                  <strong>Fix Mode:</strong> Creates isolated <code className="text-amber-300 font-mono">agent/outofoffice-*</code> Git branch, applies verified AST patches, and runs test validation.
                 </span>
               )}
             </p>
           </div>
 
-          {/* Section 4: Hero CTA - GO TOUCH GRASS */}
-          <div className="glass-panel p-6 border border-forest-600/40 space-y-4 text-center relative overflow-hidden">
-            <div className="absolute inset-0 bg-grass-neon/5 blur-2xl pointer-events-none"></div>
-
+          {/* Section 4: Primary Action */}
+          <div className="flat-card p-5 space-y-3 text-center">
             {localError && (
-              <div className="p-3 rounded-xl bg-red-950/60 border border-red-500/40 text-xs text-red-300 text-left flex items-center gap-2">
-                <AlertCircle className="h-4 w-4 text-red-400 flex-shrink-0" />
+              <div className="p-2.5 rounded bg-red-950/30 border border-red-500/30 text-xs text-red-300 text-left flex items-center gap-2">
+                <AlertCircle className="h-3.5 w-3.5 text-red-400 flex-shrink-0" />
                 <span>{localError}</span>
               </div>
             )}
 
             <div className="space-y-1">
-              <h3 className="text-lg font-bold text-white">Ready for Outdoor Freedom?</h3>
-              <p className="text-xs text-slate-400">
-                Clicking below initiates the background orchestrator and launches your away timer.
+              <h3 className="text-sm font-semibold text-white">Start Background Execution</h3>
+              <p className="text-[11px] text-slate-400">
+                Initiates background runner and opens real-time telemetry.
               </p>
             </div>
 
@@ -392,60 +367,59 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
               type="button"
               onClick={handleGoTouchGrass}
               disabled={isLaunching}
-              className="w-full btn-touch-grass py-4 text-base font-black tracking-wide flex items-center justify-center gap-3 animate-grass-pulse cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-grass-neon/20"
+              className="w-full btn-touch-grass py-2.5 text-xs font-semibold cursor-pointer disabled:opacity-50"
             >
               {isLaunching ? (
                 <>
-                  <RefreshCw className="h-5 w-5 animate-spin" />
+                  <RefreshCw className="h-3.5 w-3.5 animate-spin" />
                   <span>Launching Agent...</span>
                 </>
               ) : (
                 <>
-                  <Trees className="h-6 w-6" />
-                  <span>[ 🌳 GO TOUCH GRASS ]</span>
+                  <Play className="h-3.5 w-3.5 fill-current" />
+                  <span>Launch Task & View Telemetry</span>
                 </>
               )}
             </button>
 
-            <div className="flex items-center justify-center gap-2 text-[11px] text-slate-500 font-mono">
-              <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
-              <span>Safe to close browser or lock screen once started</span>
+            <div className="flex items-center justify-center gap-1.5 text-[11px] text-slate-500 font-mono">
+              <CheckCircle2 className="h-3 w-3 text-emerald-400" />
+              <span>Safe to close browser after starting</span>
             </div>
           </div>
 
-          {/* Section 5: Recent Missions Drawer */}
+          {/* Section 5: Recent Missions */}
           {recentJobs.length > 0 && (
-            <div className="glass-card p-5 border border-forest-800/50 space-y-3">
+            <div className="flat-card p-4 space-y-2.5">
               <div className="flex items-center justify-between">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
-                  <Clock className="h-3.5 w-3.5 text-grass-neon" />
-                  Recent Missions
+                <h4 className="text-[11px] font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                  <Clock className="h-3 w-3 text-slate-400" />
+                  Recent Jobs
                 </h4>
                 <span className="text-[10px] text-slate-500 font-mono">{recentJobs.length} logged</span>
               </div>
 
-              <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+              <div className="space-y-1.5 max-h-44 overflow-y-auto pr-1">
                 {recentJobs.slice(0, 4).map((job) => (
                   <button
                     key={job.id}
                     type="button"
                     onClick={() => handleSelectRecentJob(job.id)}
-                    className="w-full text-left p-2.5 rounded-lg bg-dark-input/60 hover:bg-forest-900/40 border border-forest-800/40 hover:border-forest-700/80 transition-all flex items-center justify-between group cursor-pointer"
+                    className="w-full text-left p-2 rounded bg-[#0d1216] hover:bg-[#182026] border border-[#222d35] transition-colors flex items-center justify-between group"
                   >
                     <div className="truncate pr-2">
-                      <div className="text-xs font-bold text-slate-200 truncate group-hover:text-grass-neon transition-colors">
+                      <div className="text-xs font-medium text-slate-200 truncate group-hover:text-emerald-400 transition-colors">
                         {job.task_prompt}
                       </div>
                       <div className="text-[10px] text-slate-500 font-mono truncate flex items-center gap-1.5 mt-0.5">
-                        <span className={`inline-block w-1.5 h-1.5 rounded-full ${
-                          job.status === 'COMPLETED' ? 'bg-emerald-400' : job.status === 'RUNNING' ? 'bg-amber-400 animate-pulse' : 'bg-slate-400'
-                        }`}></span>
+                        <span className={`inline-block w-1.5 h-1.5 rounded-full ${job.status === 'COMPLETED' ? 'bg-emerald-400' : job.status === 'RUNNING' ? 'bg-amber-400' : 'bg-slate-400'
+                          }`}></span>
                         <span>{job.mode}</span>
                         <span>•</span>
                         <span>{job.created_at ? new Date(job.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Recent'}</span>
                       </div>
                     </div>
-                    <ArrowRight className="h-3.5 w-3.5 text-slate-500 group-hover:text-grass-neon group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                    <ArrowRight className="h-3.5 w-3.5 text-slate-500 group-hover:text-emerald-400 group-hover:translate-x-0.5 transition-all flex-shrink-0" />
                   </button>
                 ))}
               </div>

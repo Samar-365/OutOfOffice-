@@ -1,6 +1,6 @@
 /**
  * Screen 3: Live Agent Trace & Telemetry Visualizer
- * Real-time LangGraph execution timeline, Sentry waterfall spans, and expandable stdout/stderr terminal drawers.
+ * Flat, minimalist, professional developer UI with zero emojis.
  */
 
 import React, { useState } from 'react';
@@ -22,11 +22,11 @@ import {
   RefreshCw,
   AlertCircle,
   FileCode,
-  Sparkles,
+  ArrowRight,
 } from 'lucide-react';
 
 interface TraceViewProps {
-  onNavigate: (screen: 'dashboard' | 'away' | 'trace' | 'results') => void;
+  onNavigate: (screen: 'dashboard' | 'trace' | 'results') => void;
 }
 
 export const TraceView: React.FC<TraceViewProps> = ({ onNavigate }) => {
@@ -64,7 +64,6 @@ ${step.stderr || '(no stderr)'}
   const findings = activeJob?.findings || [];
   const spans = traces?.spans || [];
 
-  // Filter steps by query
   const filteredSteps = steps.filter((s) => {
     if (!filterQuery) return true;
     const q = filterQuery.toLowerCase();
@@ -79,46 +78,45 @@ ${step.stderr || '(no stderr)'}
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'SUCCESS':
-        return <CheckCircle2 className="h-4 w-4 text-emerald-400" />;
+        return <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />;
       case 'RUNNING':
-        return <RefreshCw className="h-4 w-4 text-amber-400 animate-spin" />;
+        return <RefreshCw className="h-3.5 w-3.5 text-amber-400 animate-spin" />;
       case 'FAILED':
-        return <XCircle className="h-4 w-4 text-red-400" />;
+        return <XCircle className="h-3.5 w-3.5 text-red-400" />;
       default:
-        return <Clock className="h-4 w-4 text-slate-500" />;
+        return <Clock className="h-3.5 w-3.5 text-slate-500" />;
     }
   };
 
   const getSpanColor = (op: string) => {
-    if (op.startsWith('ai.model')) return 'bg-purple-500/80 border-purple-400';
-    if (op.startsWith('ai.tool')) return 'bg-emerald-500/80 border-emerald-400';
-    if (op.startsWith('langgraph')) return 'bg-cyan-500/80 border-cyan-400';
-    return 'bg-slate-500/80 border-slate-400';
+    if (op.startsWith('ai.model')) return 'bg-purple-500/80';
+    if (op.startsWith('ai.tool')) return 'bg-emerald-500/80';
+    if (op.startsWith('langgraph')) return 'bg-sky-500/80';
+    return 'bg-slate-500/80';
   };
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-5">
       {/* Top Header & Metrics Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-forest-800/40">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#222d35]">
         <div>
-          <div className="flex items-center gap-3">
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight flex items-center gap-3">
-              <Terminal className="h-7 w-7 text-grass-neon" />
-              <span>Agent Telemetry Visualizer</span>
+          <div className="flex items-center gap-2.5">
+            <h1 className="text-xl font-bold text-white tracking-tight flex items-center gap-2">
+              <Terminal className="h-5 w-5 text-emerald-400" />
+              <span>Telemetry Visualizer</span>
             </h1>
             <span
-              className={`px-2.5 py-0.5 rounded-full text-xs font-mono font-bold uppercase tracking-wider ${
-                activeJob?.status === 'RUNNING'
-                  ? 'bg-amber-950/80 border border-amber-500/40 text-amber-400 animate-pulse'
-                  : activeJob?.status === 'COMPLETED'
-                  ? 'bg-forest-950/80 border border-emerald-500/40 text-emerald-400'
-                  : 'bg-dark-card border border-forest-800 text-slate-400'
-              }`}
+              className={`px-2 py-0.5 rounded text-[10px] font-mono font-semibold uppercase tracking-wider ${activeJob?.status === 'RUNNING'
+                ? 'bg-amber-950/40 border border-amber-500/30 text-amber-400'
+                : activeJob?.status === 'COMPLETED'
+                  ? 'bg-emerald-950/40 border border-emerald-500/30 text-emerald-400'
+                  : 'bg-[#12181c] border border-[#222d35] text-slate-400'
+                }`}
             >
               {activeJob?.status || 'IDLE'}
             </span>
           </div>
-          <p className="text-slate-400 text-sm mt-1 font-mono truncate max-w-2xl">
+          <p className="text-slate-400 text-xs mt-0.5 font-mono truncate max-w-2xl">
             {activeJob?.task_prompt || 'No active task selected.'}
           </p>
         </div>
@@ -129,32 +127,32 @@ ${step.stderr || '(no stderr)'}
             type="button"
             onClick={handleManualRefresh}
             disabled={isRefreshing}
-            className="btn-secondary px-3 py-2 text-xs flex items-center gap-1.5"
+            className="btn-secondary px-3 py-1.5 text-xs flex items-center gap-1.5"
             title="Refresh Trace Data"
           >
-            <RefreshCw className={`h-3.5 w-3.5 text-grass-neon ${isRefreshing ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`h-3 w-3 text-slate-400 ${isRefreshing ? 'animate-spin' : ''}`} />
             <span>Refresh</span>
           </button>
 
           <button
             type="button"
             onClick={() => onNavigate('results')}
-            className="btn-primary px-3.5 py-2 text-xs flex items-center gap-1.5"
+            className="btn-primary px-3 py-1.5 text-xs flex items-center gap-1.5"
           >
-            <Sparkles className="h-3.5 w-3.5" />
-            <span>View Results Hub</span>
+            <span>Results Hub</span>
+            <ArrowRight className="h-3 w-3" />
           </button>
         </div>
       </div>
 
       {/* Summary KPI Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div className="glass-card p-4 border border-forest-800/50">
-          <div className="text-xs text-slate-400 flex items-center gap-1.5 mb-1 font-mono">
-            <Clock className="h-3.5 w-3.5 text-grass-neon" />
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="flat-card p-3">
+          <div className="text-[11px] text-slate-400 flex items-center gap-1 mb-0.5 font-mono">
+            <Clock className="h-3 w-3 text-emerald-400" />
             <span>Total Latency</span>
           </div>
-          <div className="text-xl font-bold font-mono text-white">
+          <div className="text-base font-semibold font-mono text-white">
             {traces ? `${(traces.total_execution_ms / 1000).toFixed(2)}s` : '0.00s'}
           </div>
           <div className="text-[10px] text-slate-500 font-mono mt-0.5">
@@ -162,12 +160,12 @@ ${step.stderr || '(no stderr)'}
           </div>
         </div>
 
-        <div className="glass-card p-4 border border-forest-800/50">
-          <div className="text-xs text-slate-400 flex items-center gap-1.5 mb-1 font-mono">
-            <Cpu className="h-3.5 w-3.5 text-purple-400" />
+        <div className="flat-card p-3">
+          <div className="text-[11px] text-slate-400 flex items-center gap-1 mb-0.5 font-mono">
+            <Cpu className="h-3 w-3 text-purple-400" />
             <span>LLM Inferences</span>
           </div>
-          <div className="text-xl font-bold font-mono text-white">
+          <div className="text-base font-semibold font-mono text-white">
             {traces?.inferences_count || 0}
           </div>
           <div className="text-[10px] text-slate-500 font-mono mt-0.5">
@@ -175,98 +173,95 @@ ${step.stderr || '(no stderr)'}
           </div>
         </div>
 
-        <div className="glass-card p-4 border border-forest-800/50">
-          <div className="text-xs text-slate-400 flex items-center gap-1.5 mb-1 font-mono">
-            <Wrench className="h-3.5 w-3.5 text-emerald-400" />
+        <div className="flat-card p-3">
+          <div className="text-[11px] text-slate-400 flex items-center gap-1 mb-0.5 font-mono">
+            <Wrench className="h-3 w-3 text-emerald-400" />
             <span>Tool Calls</span>
           </div>
-          <div className="text-xl font-bold font-mono text-white">
+          <div className="text-base font-semibold font-mono text-white">
             {traces?.tool_calls_count || steps.length}
           </div>
           <div className="text-[10px] text-slate-500 font-mono mt-0.5">
-            AST, Linters & Tests
+            AST & Test Tools
           </div>
         </div>
 
-        <div className="glass-card p-4 border border-forest-800/50">
-          <div className="text-xs text-slate-400 flex items-center gap-1.5 mb-1 font-mono">
+        <div className="flat-card p-3">
+          <div className="text-[11px] text-slate-400 flex items-center gap-1 mb-0.5 font-mono">
             <AlertCircle className="h-3.5 w-3.5 text-amber-400" />
-            <span>Findings Logged</span>
+            <span>Findings</span>
           </div>
-          <div className="text-xl font-bold font-mono text-white">
+          <div className="text-base font-semibold font-mono text-white">
             {findings.length}
           </div>
           <div className="text-[10px] text-slate-500 font-mono mt-0.5">
-            {activeJob?.diffs?.length || 0} Diffs Synthesized
+            {activeJob?.diffs?.length || 0} Diffs Generated
           </div>
         </div>
       </div>
 
-      {/* Tabs Switcher: Timeline vs Waterfall vs Findings */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
-        <div className="inline-flex p-1 bg-dark-input/80 rounded-xl border border-forest-800/60 font-mono text-xs">
+      {/* Tabs Switcher */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+        <div className="inline-flex p-1 bg-[#0d1216] rounded border border-[#222d35] font-mono text-xs">
           <button
             type="button"
             onClick={() => setViewMode('timeline')}
-            className={`px-4 py-2 rounded-lg font-bold transition-all flex items-center gap-2 cursor-pointer ${
-              viewMode === 'timeline'
-                ? 'bg-forest-800 text-white shadow-sm ring-1 ring-grass-neon/30'
-                : 'text-slate-400 hover:text-white'
-            }`}
+            className={`px-3 py-1 rounded transition-colors flex items-center gap-1.5 ${viewMode === 'timeline'
+              ? 'bg-[#182026] text-white border border-[#2e3e4a]'
+              : 'text-slate-400 hover:text-white'
+              }`}
           >
-            <Layers className="h-3.5 w-3.5 text-grass-neon" />
-            <span>Step Timeline ({steps.length})</span>
+            <Layers className="h-3 w-3 text-slate-400" />
+            <span>Timeline ({steps.length})</span>
           </button>
 
           <button
             type="button"
             onClick={() => setViewMode('waterfall')}
-            className={`px-4 py-2 rounded-lg font-bold transition-all flex items-center gap-2 cursor-pointer ${
-              viewMode === 'waterfall'
-                ? 'bg-forest-800 text-white shadow-sm ring-1 ring-grass-neon/30'
-                : 'text-slate-400 hover:text-white'
-            }`}
+            className={`px-3 py-1 rounded transition-colors flex items-center gap-1.5 ${viewMode === 'waterfall'
+              ? 'bg-[#182026] text-white border border-[#2e3e4a]'
+              : 'text-slate-400 hover:text-white'
+              }`}
           >
-            <Activity className="h-3.5 w-3.5 text-purple-400" />
-            <span>Sentry Waterfall ({spans.length})</span>
+            <Activity className="h-3 w-3 text-slate-400" />
+            <span>Waterfall ({spans.length})</span>
           </button>
 
           <button
             type="button"
             onClick={() => setViewMode('findings')}
-            className={`px-4 py-2 rounded-lg font-bold transition-all flex items-center gap-2 cursor-pointer ${
-              viewMode === 'findings'
-                ? 'bg-forest-800 text-white shadow-sm ring-1 ring-grass-neon/30'
-                : 'text-slate-400 hover:text-white'
-            }`}
+            className={`px-3 py-1 rounded transition-colors flex items-center gap-1.5 ${viewMode === 'findings'
+              ? 'bg-[#182026] text-white border border-[#2e3e4a]'
+              : 'text-slate-400 hover:text-white'
+              }`}
           >
-            <FileCode className="h-3.5 w-3.5 text-amber-400" />
+            <FileCode className="h-3 w-3 text-slate-400" />
             <span>Findings ({findings.length})</span>
           </button>
         </div>
 
-        {/* Filter / Search input */}
-        <div className="relative w-full sm:w-64">
+        {/* Filter input */}
+        <div className="relative w-full sm:w-56">
           <input
             type="text"
             value={filterQuery}
             onChange={(e) => setFilterQuery(e.target.value)}
-            placeholder="Filter logs or tools..."
-            className="w-full bg-dark-input/90 border border-forest-800/80 focus:border-grass-neon rounded-xl pl-8 pr-3 py-1.5 text-xs text-slate-100 font-mono placeholder:text-slate-500"
+            placeholder="Filter logs..."
+            className="w-full flat-input pl-7 pr-3 py-1 text-xs font-mono"
           />
-          <Terminal className="h-3.5 w-3.5 text-slate-500 absolute left-2.5 top-2.5" />
+          <Terminal className="h-3 w-3 text-slate-500 absolute left-2.5 top-2.5" />
         </div>
       </div>
 
       {/* TAB 1: Step Timeline with Expandable Drawers */}
       {viewMode === 'timeline' && (
-        <div className="space-y-3">
+        <div className="space-y-2">
           {filteredSteps.length === 0 ? (
-            <div className="glass-card p-12 text-center border border-forest-800/50 space-y-3">
-              <Terminal className="h-10 w-10 text-slate-600 mx-auto" />
-              <div className="text-sm text-slate-300 font-bold">No telemetry steps logged yet</div>
-              <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                Once the agent begins executing AST discovery, testing, or patching, live step telemetry will stream here in real time.
+            <div className="flat-card p-10 text-center space-y-2">
+              <Terminal className="h-8 w-8 text-slate-600 mx-auto" />
+              <div className="text-xs text-slate-300 font-semibold">No telemetry steps logged yet</div>
+              <p className="text-[11px] text-slate-500 max-w-xs mx-auto">
+                Step telemetry will appear here once the agent begins execution.
               </p>
             </div>
           ) : (
@@ -275,66 +270,66 @@ ${step.stderr || '(no stderr)'}
               return (
                 <div
                   key={step.id}
-                  className="glass-card border border-forest-800/60 overflow-hidden transition-all duration-200"
+                  className="flat-card overflow-hidden"
                 >
                   {/* Step Header Row */}
                   <div
                     onClick={() => setExpandedStepId(isExpanded ? null : step.id)}
-                    className="p-3.5 flex items-center justify-between gap-3 cursor-pointer hover:bg-forest-900/30 transition-colors"
+                    className="p-3 flex items-center justify-between gap-3 cursor-pointer hover:bg-[#151d22] transition-colors"
                   >
-                    <div className="flex items-center gap-3 truncate">
-                      <div className="flex items-center gap-1.5 font-mono text-xs text-slate-500">
-                        <span className="w-5 text-right font-bold text-grass-neon">#{idx + 1}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2.5 truncate">
+                      <span className="font-mono text-xs text-slate-500 w-4 text-right">
+                        {idx + 1}
+                      </span>
+                      <div className="flex items-center gap-1.5">
                         {getStatusIcon(step.status)}
-                        <span className="text-xs font-bold text-white truncate">
+                        <span className="text-xs font-medium text-white truncate">
                           {step.step_name}
                         </span>
                       </div>
                       {step.tool_name && (
-                        <span className="badge-grass text-[10px] font-mono">
-                          {step.tool_name}
+                        <span className="text-slate-400 text-[10px] font-mono">
+                          ({step.tool_name})
                         </span>
                       )}
                     </div>
 
-                    <div className="flex items-center gap-3 font-mono text-xs text-slate-400 flex-shrink-0">
+                    <div className="flex items-center gap-2.5 font-mono text-xs text-slate-400 flex-shrink-0">
                       {step.latency_ms !== null && step.latency_ms !== undefined && (
-                        <span className="text-slate-500">
+                        <span className="text-slate-500 text-[11px]">
                           {step.latency_ms}ms
                         </span>
                       )}
                       {isExpanded ? (
-                        <ChevronDown className="h-4 w-4 text-grass-neon" />
+                        <ChevronDown className="h-3.5 w-3.5 text-slate-400" />
                       ) : (
-                        <ChevronRight className="h-4 w-4 text-slate-500" />
+                        <ChevronRight className="h-3.5 w-3.5 text-slate-600" />
                       )}
                     </div>
                   </div>
 
                   {/* Expandable Terminal Logs Drawer */}
                   {isExpanded && (
-                    <div className="border-t border-forest-900/80 bg-dark-bg/95 p-4 space-y-3 font-mono text-xs animate-fade-in">
-                      <div className="flex items-center justify-between text-slate-400 pb-1 border-b border-forest-900">
-                        <span className="font-bold flex items-center gap-1.5 text-slate-300">
-                          <Terminal className="h-3.5 w-3.5 text-grass-neon" />
-                          Execution Output & Telemetry
+                    <div className="border-t border-[#222d35] bg-[#090d10] p-3 space-y-2 font-mono text-xs">
+                      <div className="flex items-center justify-between text-slate-400 pb-1 border-b border-[#182026]">
+                        <span className="font-medium text-slate-300 text-[11px] flex items-center gap-1">
+                          <Terminal className="h-3 w-3 text-emerald-400" />
+                          Output Log
                         </span>
                         <button
                           type="button"
                           onClick={() => handleCopyLogs(step)}
-                          className="hover:text-white flex items-center gap-1 text-[11px] px-2 py-0.5 rounded bg-forest-900/60 border border-forest-800"
+                          className="hover:text-white flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded bg-[#182026] border border-[#222d35]"
                         >
                           {copiedStepId === step.id ? (
                             <>
                               <Check className="h-3 w-3 text-emerald-400" />
-                              <span className="text-emerald-400">Copied!</span>
+                              <span className="text-emerald-400">Copied</span>
                             </>
                           ) : (
                             <>
                               <Copy className="h-3 w-3 text-slate-400" />
-                              <span>Copy Raw</span>
+                              <span>Copy</span>
                             </>
                           )}
                         </button>
@@ -342,11 +337,11 @@ ${step.stderr || '(no stderr)'}
 
                       {/* STDOUT Block */}
                       {step.stdout && (
-                        <div className="space-y-1">
-                          <div className="text-[10px] uppercase font-bold text-emerald-400 tracking-wider">
-                            Stdout
+                        <div className="space-y-0.5">
+                          <div className="text-[9px] uppercase font-semibold text-emerald-400 tracking-wider">
+                            stdout
                           </div>
-                          <pre className="p-3 rounded-lg bg-forest-950/90 border border-forest-900/60 text-slate-200 overflow-x-auto text-[11px] leading-relaxed max-h-60 overflow-y-auto whitespace-pre-wrap">
+                          <pre className="p-2.5 rounded bg-[#0d1216] border border-[#1e262c] text-slate-200 overflow-x-auto text-[11px] leading-relaxed max-h-52 overflow-y-auto whitespace-pre-wrap">
                             {step.stdout}
                           </pre>
                         </div>
@@ -354,19 +349,19 @@ ${step.stderr || '(no stderr)'}
 
                       {/* STDERR Block */}
                       {step.stderr && (
-                        <div className="space-y-1">
-                          <div className="text-[10px] uppercase font-bold text-red-400 tracking-wider">
-                            Stderr / Diagnostics
+                        <div className="space-y-0.5">
+                          <div className="text-[9px] uppercase font-semibold text-red-400 tracking-wider">
+                            stderr
                           </div>
-                          <pre className="p-3 rounded-lg bg-red-950/40 border border-red-900/60 text-red-200 overflow-x-auto text-[11px] leading-relaxed max-h-60 overflow-y-auto whitespace-pre-wrap">
+                          <pre className="p-2.5 rounded bg-red-950/20 border border-red-900/30 text-red-200 overflow-x-auto text-[11px] leading-relaxed max-h-52 overflow-y-auto whitespace-pre-wrap">
                             {step.stderr}
                           </pre>
                         </div>
                       )}
 
                       {!step.stdout && !step.stderr && (
-                        <div className="text-slate-500 italic text-[11px] py-2">
-                          (No output was produced by this node execution)
+                        <div className="text-slate-500 italic text-[11px] py-1">
+                          (No output produced by this step)
                         </div>
                       )}
                     </div>
@@ -378,38 +373,35 @@ ${step.stderr || '(no stderr)'}
         </div>
       )}
 
-      {/* TAB 2: Sentry Waterfall Visualizer */}
+      {/* TAB 2: Waterfall Visualizer */}
       {viewMode === 'waterfall' && (
-        <div className="glass-card p-5 border border-forest-800/60 space-y-4">
-          <div className="flex items-center justify-between pb-2 border-b border-forest-900/80">
+        <div className="flat-card p-4 space-y-3">
+          <div className="flex items-center justify-between pb-2 border-b border-[#222d35]">
             <div>
-              <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                <Activity className="h-4 w-4 text-purple-400" />
-                Sentry Agent Spans & Waterfall Breakdown
+              <h3 className="text-xs font-semibold text-white flex items-center gap-1.5">
+                <Activity className="h-3.5 w-3.5 text-purple-400" />
+                Execution Spans & Waterfall
               </h3>
-              <p className="text-[11px] text-slate-400 font-mono mt-0.5">
-                Latency profiling for AI agent nodes, model inferences, and tool executions.
-              </p>
             </div>
-            <div className="flex items-center gap-3 text-[11px] font-mono">
+            <div className="flex items-center gap-3 text-[10px] font-mono text-slate-400">
               <span className="flex items-center gap-1">
-                <span className="w-2.5 h-2.5 rounded-full bg-cyan-400"></span> Node
+                <span className="w-2 h-2 rounded bg-sky-400"></span> Node
               </span>
               <span className="flex items-center gap-1">
-                <span className="w-2.5 h-2.5 rounded-full bg-purple-400"></span> Model
+                <span className="w-2 h-2 rounded bg-purple-400"></span> Model
               </span>
               <span className="flex items-center gap-1">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400"></span> Tool
+                <span className="w-2 h-2 rounded bg-emerald-400"></span> Tool
               </span>
             </div>
           </div>
 
           {spans.length === 0 ? (
-            <div className="p-8 text-center text-slate-500 font-mono text-xs">
-              No Sentry spans captured yet for this job.
+            <div className="p-6 text-center text-slate-500 font-mono text-xs">
+              No spans recorded yet.
             </div>
           ) : (
-            <div className="space-y-2 font-mono text-xs">
+            <div className="space-y-1.5 font-mono text-xs">
               {spans.map((span) => {
                 const duration = span.duration_ms || 10;
                 const totalMs = traces?.total_execution_ms || 1000;
@@ -418,26 +410,25 @@ ${step.stderr || '(no stderr)'}
                 return (
                   <div
                     key={span.span_id}
-                    className="p-2.5 rounded-lg bg-dark-input/60 border border-forest-900/70 hover:border-forest-700/80 space-y-1.5 transition-colors"
+                    className="p-2 rounded bg-[#0d1216] border border-[#1e262c] space-y-1"
                   >
                     <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2 truncate">
-                        <span className="text-[11px] text-slate-400 font-bold">
+                      <div className="flex items-center gap-1.5 truncate">
+                        <span className="text-[10px] text-slate-400 font-semibold">
                           [{span.op}]
                         </span>
                         <span className="text-xs text-white truncate">
                           {span.description}
                         </span>
                       </div>
-                      <span className="text-xs text-grass-neon font-bold flex-shrink-0">
+                      <span className="text-xs text-emerald-400 font-semibold flex-shrink-0">
                         {duration}ms
                       </span>
                     </div>
 
-                    {/* Visual Gantt Bar */}
-                    <div className="w-full bg-forest-950 rounded-full h-2 overflow-hidden">
+                    <div className="w-full bg-[#182026] rounded-sm h-1.5 overflow-hidden">
                       <div
-                        className={`h-full rounded-full ${getSpanColor(span.op)}`}
+                        className={`h-full rounded-sm ${getSpanColor(span.op)}`}
                         style={{ width: `${widthPercent}%` }}
                       ></div>
                     </div>
@@ -451,12 +442,12 @@ ${step.stderr || '(no stderr)'}
 
       {/* TAB 3: Findings List */}
       {viewMode === 'findings' && (
-        <div className="space-y-3">
+        <div className="space-y-2">
           {findings.length === 0 ? (
-            <div className="glass-card p-12 text-center border border-forest-800/50 space-y-2">
-              <CheckCircle2 className="h-10 w-10 text-emerald-400 mx-auto" />
-              <div className="text-sm font-bold text-white">Zero issues or dead code found!</div>
-              <p className="text-xs text-slate-400">
+            <div className="flat-card p-10 text-center space-y-1.5">
+              <CheckCircle2 className="h-8 w-8 text-emerald-400 mx-auto" />
+              <div className="text-xs font-semibold text-white">No issues detected</div>
+              <p className="text-[11px] text-slate-400">
                 The codebase passed all static inspections and linter rules cleanly.
               </p>
             </div>
@@ -464,32 +455,31 @@ ${step.stderr || '(no stderr)'}
             findings.map((f) => (
               <div
                 key={f.id}
-                className="glass-card p-4 border border-forest-800/60 space-y-2 hover:border-forest-700 transition-colors"
+                className="flat-card p-3 space-y-1.5"
               >
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5">
                     <span
-                      className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase ${
-                        f.severity === 'HIGH'
-                          ? 'bg-red-950/80 text-red-400 border border-red-500/40'
-                          : f.severity === 'MEDIUM'
-                          ? 'bg-amber-950/80 text-amber-400 border border-amber-500/40'
-                          : 'bg-forest-950/80 text-emerald-400 border border-emerald-500/40'
-                      }`}
+                      className={`px-1.5 py-0.5 rounded text-[9px] font-mono font-semibold uppercase ${f.severity === 'HIGH'
+                        ? 'bg-red-950/40 text-red-400 border border-red-500/30'
+                        : f.severity === 'MEDIUM'
+                          ? 'bg-amber-950/40 text-amber-400 border border-amber-500/30'
+                          : 'bg-emerald-950/40 text-emerald-400 border border-emerald-500/30'
+                        }`}
                     >
                       {f.severity}
                     </span>
-                    <span className="badge-grass text-[10px] font-mono">
+                    <span className="text-slate-400 text-[10px] font-mono">
                       {f.category}
                     </span>
                     {f.is_fixed && (
-                      <span className="badge-grass bg-emerald-950/90 text-emerald-300 text-[10px]">
-                        ✓ Fix Applied
+                      <span className="text-emerald-400 text-[10px] font-mono">
+                        (Fixed)
                       </span>
                     )}
                   </div>
 
-                  <span className="text-[11px] font-mono text-slate-500 truncate max-w-xs">
+                  <span className="text-[10px] font-mono text-slate-500 truncate max-w-xs">
                     {f.file_path}{f.line_number ? `:${f.line_number}` : ''}
                   </span>
                 </div>
@@ -499,7 +489,7 @@ ${step.stderr || '(no stderr)'}
                 </p>
 
                 {f.evidence && (
-                  <pre className="p-2 rounded bg-forest-950/80 border border-forest-900/60 font-mono text-[11px] text-slate-400 overflow-x-auto whitespace-pre-wrap">
+                  <pre className="p-2 rounded bg-[#0d1216] border border-[#1e262c] font-mono text-[10px] text-slate-400 overflow-x-auto whitespace-pre-wrap">
                     {f.evidence}
                   </pre>
                 )}

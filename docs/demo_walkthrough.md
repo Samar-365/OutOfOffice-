@@ -75,50 +75,18 @@ sequenceDiagram
 |  | 🧹 Find Dead Code & Prune     |  | 🧪 Fix Failing Tests (AST Patch)      |  |
 |  +------------------------------+  +---------------------------------------+  |
 |                                                                               |
-|  Mode: [ 🛡️ Audit Mode ]  [ ⚡ Fix Mode ]                                       |
+|  Mode: [ Audit Mode ]  [ Fix Mode ]                                           |
 |                                                                               |
 |                   +---------------------------------------+                   |
-|                   |         [ 🌳 GO TOUCH GRASS ]          |                   |
+|                   |  [ Launch Task & View Telemetry ]     |                   |
 |                   +---------------------------------------+                   |
-|                   ✓ Safe to close browser once dispatched                     |
+|                   Safe to close browser once dispatched                       |
 +-------------------------------------------------------------------------------+
 ```
 
 ---
 
-### Screen 2: Headless Away Screen & Grass Timer (`/away`)
-* **Live Digital Timer**: Real-time elapsed duration clock counting screen freedom in `HH:MM:SS`.
-* **Outdoor Tier Badges**:
-  * 🌱 **Sprout Explorer** (<5 min)
-  * 🌿 **Meadow Stroller** (5–15 min)
-  * 🌳 **Park Ranger** (15–30 min)
-  * 🏔️ **Mountain Monk** (>30 min)
-* **Ambient Nature Ambience**: Interactive soothing audio toggle and particle glow.
-* **Safe-to-Close Banner**: Reassures the developer that the local process runs decoupled from browser tabs.
-
-```
-+-------------------------------------------------------------------------------+
-|  🛡️ Local Background Agent Active • Safe to close or lock screen               |
-|                                                                               |
-|                                     🌳                                        |
-|                          Outdoor Level: Park Ranger                           |
-|                                                                               |
-|                                 00:24:18                                      |
-|            "Full deep outdoor immersion. Tests verified green."                |
-|                                                                               |
-|               [ 2,400 Estimated Steps ]     [ 24 Mins Saved ]                 |
-|                                                                               |
-|  Status: Agent is running static analysis on AST nodes...                     |
-|                                                                               |
-|              +-------------------------------------------------+              |
-|              |      [ I'm Back! Check Results & Voice Debrief ]|              |
-|              +-------------------------------------------------+              |
-+-------------------------------------------------------------------------------+
-```
-
----
-
-### Screen 3: Live Agent Trace & Telemetry Visualizer (`/trace`)
+### Screen 2: Live Agent Trace & Telemetry Visualizer (`/trace`)
 * **Chronological Step Timeline**: Step name, tool invoked, execution status (`SUCCESS`, `RUNNING`, `FAILED`), and latency.
 * **Expandable Terminal Drawers**: Full stdout & stderr logs with 1-click clipboard copy.
 * **Sentry Distributed Waterfall Profiler**: Gantt duration bars for `ai.agent`, `ai.tool.call`, and `ai.model.inference`.
@@ -146,7 +114,7 @@ sequenceDiagram
 
 ---
 
-### Screen 4: Results Hub, Unified Diff Viewer & Audio Player (`/results`)
+### Screen 3: Results Hub, Unified Diff Viewer & Audio Player (`/results`)
 * **ElevenLabs Welcome-Back Audio Player**: Visual waveform progress bar, instant audio streaming, and voice transcript drawer.
 * **Radial Health Score Gauge**: Circular progress ring showing overall codebase score (`95/100`).
 * **Test Verification Badge**: Pass/Fail proof on isolated branch.

@@ -10,6 +10,7 @@ from typing import Any, Dict, List
 from app.agent.prompts import SYSTEM_PROMPT_AGENT_CORE, build_planner_prompt
 from app.agent.schemas import PlanItem, PlanOutput, parse_and_validate_json
 from app.agent.state import AgentState
+from app.core.config import settings
 from app.core.events import EventType, event_bus
 from app.integrations.ollama_client import ollama_client
 
@@ -93,7 +94,7 @@ async def planning_node(state: AgentState) -> Dict[str, Any]:
     task_prompt = state.get("task_prompt", "")
     repo_meta = state.get("repo_meta", {})
     mode = state.get("mode", "AUDIT")
-    model_name = state.get("model_name", "gemma2:9b")
+    model_name = state.get("model_name") or settings.DEFAULT_MODEL
 
     logger.info(f"[{job_id}] Planning node started for task: '{task_prompt}' (Mode: {mode})")
 

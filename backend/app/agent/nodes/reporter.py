@@ -11,6 +11,7 @@ from typing import Any, Dict, List, Optional
 from app.agent.prompts import SYSTEM_PROMPT_AGENT_CORE, build_reporter_prompt
 from app.agent.schemas import ReportOutput, parse_and_validate_json
 from app.agent.state import AgentState
+from app.core.config import settings
 from app.core.events import EventType, event_bus
 from app.integrations.ollama_client import ollama_client
 
@@ -94,7 +95,7 @@ async def reporter_node(state: AgentState) -> Dict[str, Any]:
     findings = state.get("findings", [])
     diffs = state.get("diffs", [])
     test_results = state.get("post_fix_test_results") or state.get("test_results")
-    model_name = state.get("model_name", "gemma2:9b")
+    model_name = state.get("model_name") or settings.DEFAULT_MODEL
 
     start_ts = state.get("away_start_timestamp", time.time())
     away_minutes = round((time.time() - start_ts) / 60.0, 1)

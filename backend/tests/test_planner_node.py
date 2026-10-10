@@ -5,7 +5,8 @@ from app.agent.nodes.planner import planning_node, _generate_fallback_plan
 from app.agent.state import create_initial_agent_state
 
 
-def test_planning_node_fallback_execution():
+def test_planning_node_fallback_execution(monkeypatch):
+    monkeypatch.setattr("app.agent.nodes.planner.ollama_client.is_running", lambda: False)
     state = create_initial_agent_state(
         job_id="test-plan-01",
         repo_path="/fake/repo",

@@ -59,7 +59,7 @@ class Settings(BaseSettings):
 
     # Local AI Inference Engine (Ollama + Gemma 2 / CodeGemma)
     OLLAMA_BASE_URL: str = Field(default="http://localhost:11434", description="Ollama local server endpoint")
-    DEFAULT_MODEL: str = Field(default="gemma2:9b", description="Primary open-weight model for agent reasoning")
+    DEFAULT_MODEL: str = Field(default="gemma2:2b", description="Primary open-weight model for agent reasoning")
     FALLBACK_MODEL: str = Field(default="gemma2:2b", description="Lightweight model fallback for low VRAM systems")
     CODE_SPECIALIST_MODEL: str = Field(default="codegemma", description="Model used for AST synthesis and code patches")
     MODEL_TEMPERATURE: float = 0.2

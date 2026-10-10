@@ -11,6 +11,7 @@ from typing import Any, Dict, List, Optional
 from app.agent.prompts import SYSTEM_PROMPT_AGENT_CORE, build_investigation_prompt
 from app.agent.schemas import InvestigationOutput, parse_and_validate_json
 from app.agent.state import AgentState
+from app.core.config import settings
 from app.core.events import EventType, event_bus
 from app.integrations.ollama_client import ollama_client
 
@@ -35,7 +36,7 @@ async def investigator_node(state: AgentState) -> Dict[str, Any]:
     """LangGraph node that diagnoses root causes for all detected issues."""
     job_id = state.get("job_id", "")
     repo_path = Path(state.get("repo_path", "")).resolve()
-    model_name = state.get("model_name", "gemma2:9b")
+    model_name = state.get("model_name") or settings.DEFAULT_MODEL
 
     findings: List[Dict[str, Any]] = list(state.get("findings", []))
     dead_code = state.get("dead_code_candidates", [])

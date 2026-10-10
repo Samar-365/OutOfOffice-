@@ -64,12 +64,13 @@ def create_initial_agent_state(
     model_name: Optional[str] = None,
 ) -> AgentState:
     """Instantiates a fresh AgentState with defaults."""
+    from app.core.config import settings
     return AgentState(
         job_id=job_id,
         repo_path=repo_path,
         task_prompt=task_prompt,
         mode=mode.upper(),
-        model_name=model_name or "gemma2:9b",
+        model_name=model_name or settings.DEFAULT_MODEL,
         status="RUNNING",
         repo_meta={},
         base_branch=None,

@@ -101,6 +101,23 @@ class OllamaClient:
                     f"Ollama daemon is not running at {self.base_url}. "
                     "Please start Ollama locally to run OutOfOffice AI."
                 )
+            except httpx.HTTPStatusError as e:
+                if e.response.status_code == 404:
+                    logger.warning(f"Model '{target_model}' not found in Ollama (404). Looking for available local fallback...")
+                    local_models = self.list_local_models()
+                    fallback_target = None
+                    for cand in [settings.DEFAULT_MODEL, settings.FALLBACK_MODEL] + local_models:
+                        if cand and any(cand == m or m.startswith(cand.split(":")[0]) for m in local_models):
+                            fallback_target = cand
+                            break
+                    if fallback_target and fallback_target != target_model:
+                        logger.info(f"Retrying Ollama generation with available local model '{fallback_target}'...")
+                        payload["model"] = fallback_target
+                        res = await client.post(f"{self.base_url}/api/generate", json=payload)
+                        res.raise_for_status()
+                        return res.json().get("response", "").strip()
+                logger.error(f"Error generating from model {target_model}: {e}")
+                raise
             except Exception as e:
                 logger.error(f"Error generating from model {target_model}: {e}")
                 raise

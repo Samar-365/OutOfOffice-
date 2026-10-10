@@ -178,6 +178,114 @@ While taking a break for **${minutes} minutes**, **OutOfOffice AI** executed an 
     );
   };
 
+  const renderFormattedReport = (rawText: string) => {
+    if (!rawText) return null;
+
+    const cleanSymbols = (str: string) => str.replace(/[*#]/g, '');
+
+    const renderInline = (text: string) => {
+      // Split on bold tokens: **bold**
+      const boldParts = text.split(/\*\*(.*?)\*\*/g);
+
+      return boldParts.map((part, i) => {
+        if (i % 2 === 1) {
+          return (
+            <strong key={i} className="text-white font-semibold">
+              {cleanSymbols(part)}
+            </strong>
+          );
+        }
+
+        // Split on inline code `code`
+        const codeParts = part.split(/`(.*?)`/g);
+        return codeParts.map((sub, j) => {
+          if (j % 2 === 1) {
+            return (
+              <code key={`${i}-${j}`} className="px-1.5 py-0.5 rounded bg-[#182026] text-emerald-300 font-mono text-[11px] border border-[#222d35]">
+                {sub}
+              </code>
+            );
+          }
+
+          // Split on italic *italic* or _italic_
+          const italicParts = sub.split(/\*(.*?)\*/g);
+          return italicParts.map((it, k) => {
+            if (k % 2 === 1) {
+              return (
+                <span key={`${i}-${j}-${k}`} className="italic text-slate-400">
+                  {cleanSymbols(it)}
+                </span>
+              );
+            }
+            return cleanSymbols(it);
+          });
+        });
+      });
+    };
+
+    const lines = rawText.split('\n');
+
+    return (
+      <div className="space-y-2 text-xs leading-relaxed">
+        {lines.map((line, idx) => {
+          const trimmed = line.trim();
+
+          if (!trimmed) {
+            return <div key={idx} className="h-1.5" />;
+          }
+
+          if (trimmed === '---' || trimmed === '***' || trimmed === '___') {
+            return <hr key={idx} className="border-[#222d35] my-2.5" />;
+          }
+
+          // Main Header (# Title or Title)
+          if (trimmed.startsWith('# ') || trimmed.toLowerCase().includes('execution report')) {
+            const headingText = cleanSymbols(trimmed.replace(/^#+\s*/, ''));
+            return (
+              <h2 key={idx} className="text-sm font-bold text-white tracking-tight pb-1.5 border-b border-[#222d35] mb-2">
+                {headingText}
+              </h2>
+            );
+          }
+
+          // Section Sub-headers (### Section or Executive Summary / Key Metrics)
+          if (
+            trimmed.startsWith('## ') ||
+            trimmed.startsWith('### ') ||
+            trimmed === 'Executive Summary' ||
+            trimmed === 'Key Metrics' ||
+            trimmed === 'Key Findings'
+          ) {
+            const subText = cleanSymbols(trimmed.replace(/^#+\s*/, ''));
+            return (
+              <h3 key={idx} className="text-xs font-semibold uppercase tracking-wider text-emerald-400 mt-3.5 mb-1.5">
+                {subText}
+              </h3>
+            );
+          }
+
+          // Bullet items
+          if (trimmed.startsWith('* ') || trimmed.startsWith('- ') || trimmed.startsWith('• ')) {
+            const bulletContent = trimmed.replace(/^[*\-•]\s+/, '');
+            return (
+              <div key={idx} className="flex items-start gap-2 py-0.5 text-slate-300">
+                <span className="text-emerald-400 select-none text-xs leading-none mt-1">•</span>
+                <span className="flex-1">{renderInline(bulletContent)}</span>
+              </div>
+            );
+          }
+
+          // Standard paragraph line
+          return (
+            <p key={idx} className="text-slate-300">
+              {renderInline(trimmed)}
+            </p>
+          );
+        })}
+      </div>
+    );
+  };
+
   return (
     <div className="space-y-6">
       {/* Audio Element */}
@@ -466,15 +574,18 @@ While taking a break for **${minutes} minutes**, **OutOfOffice AI** executed an 
         )}
       </div>
 
-      {/* Executive Report Markdown */}
+      {/* Executive Report */}
       {activeJob?.final_report_markdown && (
-        <div className="flat-card p-4 space-y-2">
-          <h3 className="text-xs font-semibold text-white flex items-center gap-1.5">
-            <Sparkles className="h-3.5 w-3.5 text-emerald-400" />
-            Executive Report
-          </h3>
-          <div className="p-3 rounded bg-[#0d1216] border border-[#1e262c] text-xs text-slate-300 leading-relaxed whitespace-pre-wrap font-mono">
-            {activeJob.final_report_markdown}
+        <div className="flat-card p-4 space-y-3">
+          <div className="flex items-center justify-between pb-2 border-b border-[#222d35]">
+            <h3 className="text-xs font-semibold text-white flex items-center gap-1.5">
+              <Sparkles className="h-3.5 w-3.5 text-emerald-400" />
+              <span>Executive Report</span>
+            </h3>
+            <span className="text-[10px] font-mono text-slate-500">Autonomous Synthesis</span>
+          </div>
+          <div className="p-4 rounded bg-[#0d1216] border border-[#1e262c]">
+            {renderFormattedReport(activeJob.final_report_markdown)}
           </div>
         </div>
       )}

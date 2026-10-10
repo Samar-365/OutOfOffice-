@@ -127,34 +127,34 @@ async def reporter_node(state: AgentState) -> Dict[str, Any]:
     else:
         report_output = _generate_fallback_report(task_prompt, repo_meta, findings, diffs, test_results, away_minutes)
 
-    # Format markdown report
+    # Format clean report
     if report_output.key_findings:
-        findings_bullets = "\n".join(f"- {kf}" for kf in report_output.key_findings)
+        findings_bullets = "\n".join(f"• {kf}" for kf in report_output.key_findings)
     else:
-        findings_bullets = "- No blocking issues detected."
+        findings_bullets = "• No blocking issues detected."
 
-    markdown_report = f"""# 🌳 OutOfOffice AI — Execution Report
-**Repository:** `{repo_meta.get('repo_name', 'Local Codebase')}`  
-**Task:** *"{task_prompt}"*  
-**Repository Health Score:** **{report_output.health_score} / 100**  
-**Away Time ('Grass Touched'):** {int(away_minutes)} minutes  
+    markdown_report = f"""OutOfOffice AI — Execution Report
+Repository: {repo_meta.get('repo_name', 'Local Codebase')}
+Task: "{task_prompt}"
+Repository Health Score: {report_output.health_score} / 100
+Away Time ('Grass Touched'): {int(away_minutes)} minutes
 
 ---
 
-### Executive Summary
+Executive Summary
 {report_output.summary}
 
-### Key Metrics
-* **Files Analyzed:** {report_output.files_analyzed_count}
-* **Issues Discovered:** {report_output.issues_found_count}
-* **Safe Fixes Applied:** {report_output.safe_fixes_applied_count}
-* **Test Suite Status:** {report_output.test_summary}
+Key Metrics
+• Files Analyzed: {report_output.files_analyzed_count}
+• Issues Discovered: {report_output.issues_found_count}
+• Safe Fixes Applied: {report_output.safe_fixes_applied_count}
+• Test Suite Status: {report_output.test_summary}
 
-### Key Findings
+Key Findings
 {findings_bullets}
 
 ---
-*Generated autonomously by OutOfOffice AI with Google Gemma 2 & local-first inference.*
+Generated autonomously by OutOfOffice AI with Google Gemma 2 & local-first inference.
 """
 
     # Emit job completed event

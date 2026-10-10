@@ -173,6 +173,7 @@ Generated autonomously by OutOfOffice AI with Google Gemma 2 & local-first infer
         "health_score": report_output.health_score,
         "final_report_markdown": markdown_report,
         "voice_brief_script": report_output.voice_brief_script,
+        "voice_script": report_output.voice_brief_script,
         "away_duration_minutes": away_minutes,
         "status": "COMPLETED",
         "logs": state.get("logs", []) + [f"Final report generated with Health Score: {report_output.health_score}/100."],

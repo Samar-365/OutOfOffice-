@@ -323,7 +323,7 @@ class JobRunner:
                 session.add(diff_obj)
 
             # Generate and Save Audio Briefing
-            voice_script = state.get("voice_script")
+            voice_script = state.get("voice_script") or state.get("voice_brief_script")
             if voice_script:
                 try:
                     audio_res = await elevenlabs_generator.generate_voice_briefing(job_id, voice_script)

@@ -199,11 +199,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
 
             {/* Validation Feedback */}
             {validationSuccess === true && repoMetadata && (
-              <div className="p-3 rounded bg-[#0d1216] border border-[#222d35] text-xs space-y-1.5">
-                <div className="flex items-center justify-between font-mono">
-                  <div className="flex items-center gap-1.5 text-emerald-400 font-medium">
-                    <CheckCircle2 className="h-3.5 w-3.5" />
-                    <span>Valid Repository: {repoMetadata.repo_path.split(/[\\/]/).pop() || repoMetadata.repo_path}</span>
+              <div className="p-3 rounded bg-blue-950/20 border border-blue-500/30 text-xs space-y-2">
+                <div className="flex items-center gap-2 text-blue-400 font-medium">
+                  <CheckCircle2 className="h-3.5 w-3.5 text-blue-400 flex-shrink-0" />
+                  <span>Repository verified and ready for autonomous agent execution.</span>
+                </div>
+                <div className="flex items-center justify-between font-mono pt-1.5 border-t border-blue-900/30 text-[11px]">
+                  <div className="flex items-center gap-1.5 text-blue-200">
+                    <span>{repoMetadata.repo_path.split(/[\\/]/).pop() || repoMetadata.repo_path}</span>
                   </div>
                   <div className="flex items-center gap-1 text-slate-400">
                     <GitBranch className="h-3 w-3 text-slate-400" />
@@ -211,7 +214,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                   </div>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-3 text-slate-400 pt-1 border-t border-[#182026] text-[11px]">
+                <div className="flex flex-wrap items-center gap-3 text-slate-400 text-[11px]">
                   <div className="flex items-center gap-1">
                     <FileCode className="h-3 w-3 text-slate-500" />
                     <span>{repoMetadata.total_files} files</span>
@@ -237,8 +240,18 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
             )}
 
             {validationSuccess === false && (
-              <div className="p-2.5 rounded bg-red-950/20 border border-red-500/20 text-xs text-red-300 flex items-center gap-2">
-                <AlertCircle className="h-3.5 w-3.5 text-red-400 flex-shrink-0" />
+              <div
+                className={`p-2.5 rounded text-xs flex items-center gap-2 ${
+                  storeError && (storeError.toLowerCase().includes('verified') || storeError.toLowerCase().includes('ready'))
+                    ? 'bg-blue-950/20 border border-blue-500/30 text-blue-300'
+                    : 'bg-red-950/20 border border-red-500/20 text-red-300'
+                }`}
+              >
+                {storeError && (storeError.toLowerCase().includes('verified') || storeError.toLowerCase().includes('ready')) ? (
+                  <CheckCircle2 className="h-3.5 w-3.5 text-blue-400 flex-shrink-0" />
+                ) : (
+                  <AlertCircle className="h-3.5 w-3.5 text-red-400 flex-shrink-0" />
+                )}
                 <span>{storeError || 'Directory does not exist or is not a valid git repository.'}</span>
               </div>
             )}

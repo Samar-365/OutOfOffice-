@@ -131,8 +131,21 @@ export const JobProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setError(null);
     try {
       const res = await api.validateRepo(path.trim());
-      if (res.valid && res.metadata) {
-        setRepoMetadata(res.metadata);
+      const isValid = Boolean(res.is_valid ?? res.valid);
+      if (isValid) {
+        const metadata: RepoMetadata = res.metadata || {
+          repo_path: res.repo_path || path.trim(),
+          is_git_repo: res.is_git_repo ?? true,
+          current_branch: res.current_branch || 'main',
+          total_files: res.file_count ?? 0,
+          languages: res.detected_languages || [],
+          primary_language: res.detected_languages?.[0] || null,
+          test_framework: res.test_framework || null,
+          has_uncommitted_changes: res.has_uncommitted_changes ?? false,
+          untracked_files_count: 0,
+        };
+        setRepoMetadata(metadata);
+        setError(null);
         return true;
       } else {
         setRepoMetadata(null);

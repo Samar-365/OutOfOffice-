@@ -13,6 +13,7 @@ class RepoValidateRequest(BaseModel):
 class RepoValidateResponse(BaseModel):
     """Response payload with repository metadata."""
     is_valid: bool
+    valid: bool = True
     repo_path: str
     is_git_repo: bool
     current_branch: Optional[str] = None
@@ -23,6 +24,11 @@ class RepoValidateResponse(BaseModel):
     test_framework: Optional[str] = None
     file_count: int = 0
     message: str = ""
+
+    def __init__(self, **data):
+        if "valid" not in data and "is_valid" in data:
+            data["valid"] = data["is_valid"]
+        super().__init__(**data)
 
 
 class JobCreateRequest(BaseModel):

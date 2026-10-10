@@ -99,8 +99,18 @@ export interface RepoMetadata {
 }
 
 export interface RepoValidationResponse {
-  valid: boolean;
+  valid?: boolean;
+  is_valid?: boolean;
   message?: string;
+  repo_path?: string;
+  is_git_repo?: boolean;
+  current_branch?: string | null;
+  has_uncommitted_changes?: boolean;
+  detected_languages?: string[];
+  project_type?: string | null;
+  manifest_files?: string[];
+  test_framework?: string | null;
+  file_count?: number;
   metadata?: RepoMetadata | null;
 }
 

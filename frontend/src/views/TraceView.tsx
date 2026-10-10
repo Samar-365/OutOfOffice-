@@ -106,14 +106,16 @@ ${step.stderr || '(no stderr)'}
               <span>Telemetry Visualizer</span>
             </h1>
             <span
-              className={`px-2 py-0.5 rounded text-[10px] font-mono font-semibold uppercase tracking-wider ${activeJob?.status === 'RUNNING'
+              className={`px-2 py-0.5 rounded text-[10px] font-mono font-semibold uppercase tracking-wider flex items-center gap-1 ${activeJob?.status === 'RUNNING'
                 ? 'bg-amber-950/40 border border-amber-500/30 text-amber-400'
                 : activeJob?.status === 'COMPLETED'
                   ? 'bg-emerald-950/40 border border-emerald-500/30 text-emerald-400'
                   : 'bg-[#12181c] border border-[#222d35] text-slate-400'
                 }`}
             >
-              {activeJob?.status || 'IDLE'}
+              {activeJob?.status === 'RUNNING' && <RefreshCw className="h-2.5 w-2.5 animate-spin text-amber-400" />}
+              {activeJob?.status === 'COMPLETED' && <CheckCircle2 className="h-2.5 w-2.5 text-emerald-400" />}
+              <span>{activeJob?.status || 'IDLE'}</span>
             </span>
           </div>
           <p className="text-slate-400 text-xs mt-0.5 font-mono truncate max-w-2xl">
@@ -144,6 +146,48 @@ ${step.stderr || '(no stderr)'}
           </button>
         </div>
       </div>
+
+      {/* Telemetry Status & Loader Banner */}
+      {activeJob?.status === 'RUNNING' && (
+        <div className="p-3 rounded bg-amber-950/20 border border-amber-500/30 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+          <div className="flex items-center gap-2.5">
+            <div className="relative flex h-2.5 w-2.5 flex-shrink-0">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
+            </div>
+            <div>
+              <span className="text-amber-300 font-medium font-mono">Agent Executing Pipeline...</span>
+              <span className="text-slate-400 ml-2 text-[11px] block sm:inline">Collecting telemetry spans & AST tool results</span>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 font-mono text-[11px] text-amber-400/90 self-start sm:self-auto">
+            <RefreshCw className="h-3 w-3 animate-spin text-amber-400" />
+            <span>Streaming live traces</span>
+          </div>
+        </div>
+      )}
+
+      {activeJob?.status === 'COMPLETED' && (
+        <div className="p-3 rounded bg-emerald-950/20 border border-emerald-500/30 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+          <div className="flex items-center gap-2.5">
+            <CheckCircle2 className="h-4 w-4 text-emerald-400 flex-shrink-0" />
+            <div>
+              <span className="text-emerald-300 font-medium font-mono">Telemetry Execution Completed</span>
+              <span className="text-slate-400 ml-2 text-[11px] block sm:inline">
+                All {traces?.total_spans || spans.length} execution spans & findings indexed
+              </span>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => onNavigate('results')}
+            className="btn-primary px-3 py-1.5 text-xs flex items-center gap-1.5 self-start sm:self-auto"
+          >
+            <span>Proceed to Results Hub</span>
+            <ArrowRight className="h-3 w-3" />
+          </button>
+        </div>
+      )}
 
       {/* Summary KPI Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -370,6 +414,16 @@ ${step.stderr || '(no stderr)'}
               );
             })
           )}
+
+          {activeJob?.status === 'RUNNING' && (
+            <div className="flat-card p-3 border border-dashed border-amber-500/40 bg-amber-950/10 flex items-center justify-between font-mono text-xs">
+              <div className="flex items-center gap-2 text-amber-300">
+                <RefreshCw className="h-3 w-3 animate-spin text-amber-400" />
+                <span>Next autonomous step executing...</span>
+              </div>
+              <span className="text-slate-500 text-[11px]">Collecting live step outputs</span>
+            </div>
+          )}
         </div>
       )}
 
@@ -435,6 +489,16 @@ ${step.stderr || '(no stderr)'}
                   </div>
                 );
               })}
+
+              {activeJob?.status === 'RUNNING' && (
+                <div className="p-2.5 rounded border border-dashed border-amber-500/40 bg-amber-950/10 flex items-center justify-between font-mono text-xs">
+                  <div className="flex items-center gap-2 text-amber-300">
+                    <RefreshCw className="h-3 w-3 animate-spin text-amber-400" />
+                    <span>[ai.live] Instrumentation span recording in progress...</span>
+                  </div>
+                  <span className="text-slate-500 text-[11px]">Collecting live timing</span>
+                </div>
+              )}
             </div>
           )}
         </div>

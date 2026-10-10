@@ -94,13 +94,13 @@ class AgentWorkflow:
             while state.get("current_step_idx", 0) < total_steps:
                 step_idx = state.get("current_step_idx", 0)
                 step_obj = state.get("plan_steps", [])[step_idx] if step_idx < len(state.get("plan_steps", [])) else {}
-                step_name_str = step_obj.get("description", f"Step {step_idx}")
+                step_name_str = step_obj.get("step_name") or step_obj.get("description") or step_obj.get("tool_name") or f"Step {step_idx}"
                 async with sentry_tracer.trace_step(job_id=job_id, step_name=step_name_str, step_index=2 + step_idx):
                     try:
                         exec_updates = await executor_node(state)
                         state.update(exec_updates)
                         if on_step_update:
-                            await self._invoke_callback(on_step_update, state, f"Step {step_idx}")
+                            await self._invoke_callback(on_step_update, state, step_name_str)
                     except Exception as e:
                         logger.error(f"[{job_id}] Step execution error: {e}")
                         state["errors"].append(f"Execution error: {e}")

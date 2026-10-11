@@ -7,12 +7,12 @@ import React from 'react';
 import { Terminal, Activity, ShieldCheck, Layers } from 'lucide-react';
 
 interface NavbarProps {
-  activeScreen?: 'dashboard' | 'trace' | 'results';
-  onNavigate?: (screen: 'dashboard' | 'trace' | 'results') => void;
+  activeScreen?: 'landing' | 'dashboard' | 'trace' | 'results';
+  onNavigate?: (screen: 'landing' | 'dashboard' | 'trace' | 'results') => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
-  activeScreen = 'dashboard',
+  activeScreen = 'landing',
   onNavigate,
 }) => {
 
@@ -21,7 +21,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
         {/* Brand & Logo */}
         <div
-          onClick={() => onNavigate && onNavigate('dashboard')}
+          onClick={() => onNavigate && onNavigate('landing')}
           className="flex items-center gap-2.5 cursor-pointer select-none"
         >
           <div className="h-8 w-8 rounded bg-[#182026] border border-[#222d35] flex items-center justify-center text-emerald-400">
@@ -38,6 +38,15 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         {/* Navigation Tabs */}
         <nav className="flex items-center gap-1 bg-[#12181c] p-1 rounded-md border border-[#222d35]">
+          <button
+            onClick={() => onNavigate && onNavigate('landing')}
+            className={`px-3 py-1 rounded text-xs font-medium transition-colors ${activeScreen === 'landing'
+              ? 'bg-[#182026] text-white border border-[#2e3e4a]'
+              : 'text-slate-400 hover:text-slate-200'
+              }`}
+          >
+            Overview
+          </button>
           <button
             onClick={() => onNavigate && onNavigate('dashboard')}
             className={`px-3 py-1 rounded text-xs font-medium transition-colors ${activeScreen === 'dashboard'

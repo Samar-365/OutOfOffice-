@@ -5,19 +5,24 @@
 
 import React, { useState } from 'react';
 import { Navbar } from './components/Navbar';
+import { LandingPage } from './views/LandingPage';
 import { Dashboard } from './views/Dashboard';
 import { TraceView } from './views/TraceView';
 import { ResultsHub } from './views/ResultsHub';
 import { Terminal } from 'lucide-react';
 
 export const App: React.FC = () => {
-  const [activeScreen, setActiveScreen] = useState<'dashboard' | 'trace' | 'results'>('dashboard');
+  const [activeScreen, setActiveScreen] = useState<'landing' | 'dashboard' | 'trace' | 'results'>('landing');
 
   return (
     <div className="min-h-screen flex flex-col bg-[#0b0f12] text-slate-100 antialiased">
       <Navbar activeScreen={activeScreen} onNavigate={setActiveScreen} />
 
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <main className="flex-1 flex flex-col max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {activeScreen === 'landing' && (
+          <LandingPage onNavigate={setActiveScreen} />
+        )}
+
         {activeScreen === 'dashboard' && (
           <Dashboard onNavigate={setActiveScreen} />
         )}

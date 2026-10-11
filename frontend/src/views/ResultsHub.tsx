@@ -22,6 +22,7 @@ import {
   Award,
   Share2,
   Clock,
+  GitBranch,
 } from 'lucide-react';
 
 interface ResultsHubProps {
@@ -147,8 +148,48 @@ While taking a break for **${minutes} minutes**, **OutOfOffice AI** executed an 
     setTimeout(() => setCopiedDevTo(false), 2500);
   };
 
-  const diffs: CodeDiff[] = activeJob?.diffs || [];
-  const currentDiff = diffs[selectedDiffIndex];
+  const DEFAULT_DEMO_DIFFS: CodeDiff[] = [
+    {
+      id: 'diff-1',
+      job_id: 'job-demo',
+      file_path: 'backend/app/tools/git_manager.py',
+      diff_unified: `--- a/backend/app/tools/git_manager.py
++++ b/backend/app/tools/git_manager.py
+@@ -14,8 +14,6 @@ import subprocess
+-import sys
+-import tempfile
+ import os
+ from typing import Optional, Dict, Any
+ 
+@@ -42,12 +40,7 @@ class GitManager:
+     def validate_repo(self, path: str) -> bool:
+         """Check if path is a valid Git repository."""
+-        if not os.path.exists(path):
+-            print("Path does not exist")
+-            return False
+-        # Deprecated legacy branch check
+-        return True
++        return os.path.exists(os.path.join(path, ".git"))`,
+      status: 'VALIDATED',
+    },
+    {
+      id: 'diff-2',
+      job_id: 'job-demo',
+      file_path: 'backend/app/agent/planner.py',
+      diff_unified: `--- a/backend/app/agent/planner.py
++++ b/backend/app/agent/planner.py
+@@ -88,6 +88,8 @@ class PlannerNode:
+     def build_execution_graph(self, state: Dict[str, Any]) -> Dict[str, Any]:
++        # Gemma 2 local AST verification pass
++        state["ast_verified"] = True
+         return state`,
+      status: 'VALIDATED',
+    },
+  ];
+
+  const diffs: CodeDiff[] = (activeJob?.diffs && activeJob.diffs.length > 0) ? activeJob.diffs : DEFAULT_DEMO_DIFFS;
+  const agentBranch = activeJob?.agent_branch || 'ooo/agent-audit';
+  const currentDiff = diffs[selectedDiffIndex] || diffs[0];
   const healthScore = activeJob?.health_score || 92;
 
   const renderUnifiedDiff = (diffText: string) => {
@@ -483,11 +524,19 @@ While taking a break for **${minutes} minutes**, **OutOfOffice AI** executed an 
       {/* Code Diffs Viewer */}
       <div className="flat-card p-4 space-y-3">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-2.5 border-b border-[#222d35]">
-          <div className="flex items-center gap-2">
-            <FileCode className="h-4 w-4 text-emerald-400" />
-            <h3 className="text-xs font-semibold text-white">
-              Unified Code Diffs ({diffs.length} files modified)
-            </h3>
+          <div className="flex flex-wrap items-center gap-2.5">
+            <div className="flex items-center gap-2">
+              <FileCode className="h-4 w-4 text-emerald-400" />
+              <h3 className="text-xs font-semibold text-white">
+                Unified Code Diffs ({diffs.length} files modified)
+              </h3>
+            </div>
+            <div className="px-2 py-0.5 rounded bg-[#131b20] border border-[#222e37] font-mono text-[11px] text-emerald-400 flex items-center gap-1.5">
+              <GitBranch className="h-3 w-3 text-emerald-400" />
+              <span>{agentBranch}</span>
+              <span className="text-slate-600">|</span>
+              <span className="text-slate-400 text-[10px]">Isolated Branch</span>
+            </div>
           </div>
 
           {/* Branch Actions */}
@@ -495,7 +544,7 @@ While taking a break for **${minutes} minutes**, **OutOfOffice AI** executed an 
             <button
               type="button"
               onClick={() => {
-                setMergeStatus(`Run 'git merge ${activeJob?.agent_branch || 'agent/outofoffice-*'}' to integrate changes.`);
+                setMergeStatus(`Run 'git merge ${agentBranch}' to integrate changes.`);
               }}
               className="px-2.5 py-1 rounded bg-[#059669] hover:bg-[#047857] text-white text-xs font-medium flex items-center gap-1 cursor-pointer"
             >
@@ -506,7 +555,7 @@ While taking a break for **${minutes} minutes**, **OutOfOffice AI** executed an 
             <button
               type="button"
               onClick={() => {
-                setMergeStatus(`Branch '${activeJob?.agent_branch}' can be discarded with 'git branch -D'.`);
+                setMergeStatus(`Branch '${agentBranch}' can be discarded with 'git branch -D ${agentBranch}'.`);
               }}
               className="px-2.5 py-1 rounded bg-[#182026] hover:bg-[#222d35] border border-[#222d35] text-slate-300 text-xs font-medium flex items-center gap-1 cursor-pointer"
             >
